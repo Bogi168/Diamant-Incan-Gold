@@ -21,7 +21,7 @@ class Player:
 
     def ask_question(self, diamonds_on_way):
         self.tell_pocket()
-        print(f"There are {diamonds_on_way} diamonds on the way home")
+        print(f"There is/are {diamonds_on_way} diamond(s) on the way home")
         question = input(f"{self.player_name}: Do you want to go home? (Y/N) ").upper()
         while not question.isalpha():
             question = input(f"{self.player_name}: {question} is not valid. Do you want to go home? (Y/N) ").upper()
@@ -40,4 +40,3 @@ for player_num in range(players_amount):
     player_name = input(f"Enter player number {player_num+1}'s name: ").capitalize()
     players.append(player_name)
 players = [Player(players[i]) for i in range(len(players))]
-
