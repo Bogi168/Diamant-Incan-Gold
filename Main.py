@@ -84,10 +84,12 @@ while is_running:
                 print("You are out of cards!")
                 for o in range(len(players_inside)):
                     players_inside[o].go_home()
-
+            
             else:
                 new_card = draw_card()
                 print(f"The drawn card was a {new_card}")
+                if new_card in treasure_cards:
+                    diamonds_on_way += new_card % len(players_inside)
                 if new_card in relics:
                     relics_on_way += int(new_card)
                 if new_card in traps:
@@ -103,19 +105,17 @@ while is_running:
                         if not new_card in played_cards:
                             if relics_on_way != 0:
                                 print(f"There are relics worth {relics_on_way} diamonds on the way")
-                            players_inside[i].ask_question()
-
+                            players_inside[i].ask_question(diamonds_on_way)
 
                     elif new_card in treasure_cards:
-                        diamonds_on_way += new_card % len(players_inside)
                         players_inside[i].pocket += new_card // len(players_inside)
                         if relics_on_way != 0:
                             print(f"There are relics worth {relics_on_way} diamonds on the way")
-                        players_inside[i].ask_question()
+                        players_inside[i].ask_question(diamonds_on_way)
 
                     elif new_card in relics:
                         print(f"There are relics worth {relics_on_way} diamonds on the way")
-                        players_inside[i].ask_question()
+                        players_inside[i].ask_question(diamonds_on_way)
 
             if relics_on_way != 0 and p_inside:
                 if len(_player.go_home_now) == 1:
@@ -140,4 +140,3 @@ while is_running:
         print(f"{s.player_name} earned {s.chest} Diamonds")
 
     is_running = False
-
