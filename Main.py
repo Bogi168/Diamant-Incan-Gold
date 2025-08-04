@@ -6,7 +6,7 @@ spiders = ["spider", "spider", "spider"]
 fires = ["fire", "fire", "fire"]
 avalanches = ["avalanche", "avalanche", "avalanche"]
 mummys = ["mummy", "mummy", "mummy"]
-treasure_cards = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, ]
+treasure_cards = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9]
 relics = [4.01, 8.01, 11.01]
 traps = []
 
@@ -84,11 +84,11 @@ while is_running:
                 print("You are out of cards!")
                 for o in range(len(players_inside)):
                     players_inside[o].go_home()
-            
+
             else:
                 new_card = draw_card()
                 print(f"The drawn card was a {new_card}")
-                if new_card in treasure_cards:
+                if new_card in treasure_cards and len(players_inside) != 0:
                     diamonds_on_way += new_card % len(players_inside)
                 if new_card in relics:
                     relics_on_way += int(new_card)
@@ -116,7 +116,10 @@ while is_running:
                     elif new_card in relics:
                         print(f"There are relics worth {relics_on_way} diamonds on the way")
                         players_inside[i].ask_question(diamonds_on_way)
-
+            if len(_player.go_home_now) != 0 and p_inside:
+                for homer in _player.go_home_now:
+                    homer.chest += diamonds_on_way//len(_player.go_home_now)
+                diamonds_on_way = diamonds_on_way%len(_player.go_home_now)
             if relics_on_way != 0 and p_inside:
                 if len(_player.go_home_now) == 1:
                     _player.go_home_now[0].chest += relics_on_way
