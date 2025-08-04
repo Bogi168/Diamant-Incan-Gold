@@ -61,7 +61,7 @@ p_inside = True
 played_cards = []
 diamonds_on_way = 0
 relics_on_way = 0
-players_inside = _player.players.copy()
+players_inside = [p for p in _player.players if p.inside]
 
 
 def draw_card():
@@ -140,3 +140,4 @@ while is_running:
         print(f"{s.player_name} earned {s.chest} Diamonds")
 
     is_running = False
+
