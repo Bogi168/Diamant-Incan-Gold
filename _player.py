@@ -19,8 +19,9 @@ class Player:
     def tell_pocket(self):
         print(f"You have {self.pocket} diamond(s) in your pocket")
 
-    def ask_question(self):
+    def ask_question(self, diamonds_on_way):
         self.tell_pocket()
+        print(f"There are {diamonds_on_way} diamonds on the way home")
         question = input(f"{self.player_name}: Do you want to go home? (Y/N) ").upper()
         while not question.isalpha():
             question = input(f"{self.player_name}: {question} is not valid. Do you want to go home? (Y/N) ").upper()
@@ -39,27 +40,4 @@ for player_num in range(players_amount):
     player_name = input(f"Enter player number {player_num+1}'s name: ").capitalize()
     players.append(player_name)
 players = [Player(players[i]) for i in range(len(players))]
-
-#print(players[0].player_name)
-#print(players[1].player_name)
-#print(players[0].pocket)
-#print(players[1].chest)
-#print(type(players[0]))
-
-
-#Eingabe Namen der Spieler
-
-#players = []
-
-#players_amount = input("How many players? ")
-#while not players_amount.isdigit():
-#    players_amount = input("That's not a number. How many players? ")
-#players_amount= int(players_amount)
-
-#for player_num in range(players_amount):
-#    player_name = input(f"Enter player number {player_num+1}'s name: ")
-#    players.append(player_name)
-#    print(f"Hi {player_name}!")
-#print(players)
-
 
