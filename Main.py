@@ -58,6 +58,8 @@ diamonds_on_way = 0
 relics_on_way = 0
 players_inside = [p for p in _player.players if p.inside]
 p_relics = relics.copy()
+d_winner = 0
+winners = []
 
 def draw_card():
     drawn = random.choice(p_cards)
@@ -72,7 +74,10 @@ while is_running:
         cards.append(card)
         p_relics.remove(card)
         p_cards = cards.copy()
-        print(f"Round: {rounds+1}")
+        print()
+        print("****************************************")
+        print(f"*               Round: {(rounds+1)}               *")
+        print("****************************************")
         p_inside = True
 
         while p_inside:
@@ -84,6 +89,7 @@ while is_running:
                 new_card = draw_card()
                 if new_card in traps:
                     if new_card in played_cards:
+                        print()
                         print(f"Oh no! It's the second {new_card}")
                         print("All the players inside lose their diamonds!")
                         cards.remove(new_card)
@@ -91,7 +97,9 @@ while is_running:
                             p.die()
                         p_inside = False
                         continue
+                print()
                 print(f"The drawn card was a {new_card}")
+                print()
                 if new_card in treasure_cards and len(players_inside) != 0:
                     diamonds_on_way += new_card % len(players_inside)
                 if new_card in relics:
@@ -99,23 +107,26 @@ while is_running:
                     cards.remove(new_card)
                 for i in range(len(players_inside)):
                     if new_card in traps:
+                        print("_____________________________________________________________")
                         if relics_on_way != 0:
                             print(f"There are relics worth {relics_on_way} diamonds on the way")
                         players_inside[i].ask_question(diamonds_on_way)
 
                     elif new_card in treasure_cards:
+                        print("_____________________________________________________________")
                         players_inside[i].pocket += new_card // len(players_inside)
                         if relics_on_way != 0:
                             print(f"There are relics worth {relics_on_way} diamonds on the way")
                         players_inside[i].ask_question(diamonds_on_way)
 
                     elif new_card in relics:
+                        print("_____________________________________________________________")
                         print(f"There are relics worth {relics_on_way} diamonds on the way")
                         players_inside[i].ask_question(diamonds_on_way)
             if len(_player.go_home_now) != 0 and p_inside:
                 for homer in _player.go_home_now:
-                    homer.chest += diamonds_on_way//len(_player.go_home_now)
-                diamonds_on_way = diamonds_on_way%len(_player.go_home_now)
+                    homer.chest += diamonds_on_way // len(_player.go_home_now)
+                diamonds_on_way = diamonds_on_way % len(_player.go_home_now)
             if relics_on_way != 0 and p_inside:
                 if len(_player.go_home_now) == 1:
                     _player.go_home_now[0].chest += relics_on_way
@@ -135,9 +146,28 @@ while is_running:
         diamonds_on_way = 0
         relics_on_way = 0
         p_cards = cards.copy()
-
     for s in _player.players:
         print(f"{s.player_name} collected {s.chest} Diamonds")
-
+        if d_winner < s.chest:
+            d_winner = s.chest
+            winners.clear()
+            winners.append(s)
+        elif d_winner == s.chest:
+            winners.append(s)
+    print("_____________________________________________________________")
+    print()
+    print("*************************************************************")
+    if len(winners) == 1:
+        print(f"The winner is: {winners[0].player_name}")
+    else:
+        print(f"The winners are: ", end = "")
+        for winner in winners:
+            if winner == winners[-1]:
+                print("& " + winner.player_name)
+            elif winner == winners[-2]:
+                print(winner.player_name, end=" ")
+            else:
+                print(winner.player_name, end=", ")
+    print("*************************************************************")
     is_running = False
 
