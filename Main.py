@@ -7,7 +7,7 @@ fires = ["fire", "fire", "fire"]
 avalanches = ["avalanche", "avalanche", "avalanche"]
 mummys = ["mummy", "mummy", "mummy"]
 treasure_cards = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9]
-relics = [4.01, 8.01, 11.01]
+relics = [4.01, 6.01, 8.01, 11.01, 14.01]
 traps = []
 
 for snake in snakes:
@@ -46,11 +46,6 @@ for mummy in mummys:
 for treasure in treasure_cards:
     card = treasure
     cards.append(card)
-for relic in relics:
-    card = relic
-    cards.append(card)
-
-p_cards = cards.copy()
 
 #Spieler
 import _player
@@ -62,7 +57,7 @@ played_cards = []
 diamonds_on_way = 0
 relics_on_way = 0
 players_inside = [p for p in _player.players if p.inside]
-
+p_relics = relics.copy()
 
 def draw_card():
     drawn = random.choice(p_cards)
@@ -73,7 +68,10 @@ def draw_card():
 while is_running:
 
     for rounds in range(5):
-
+        card = random.choice(p_relics)
+        cards.append(card)
+        p_relics.remove(card)
+        p_cards = cards.copy()
         print(f"Round: {rounds+1}")
         p_inside = True
 
@@ -87,7 +85,8 @@ while is_running:
                 if new_card in traps:
                     if new_card in played_cards:
                         print(f"Oh no! It's the second {new_card}")
-                        print("All players lose their diamonds!")
+                        print("All the players inside lose their diamonds!")
+                        cards.remove(new_card)
                         for p in players_inside:
                             p.die()
                         p_inside = False
@@ -97,6 +96,7 @@ while is_running:
                     diamonds_on_way += new_card % len(players_inside)
                 if new_card in relics:
                     relics_on_way += int(new_card)
+                    cards.remove(new_card)
                 for i in range(len(players_inside)):
                     if new_card in traps:
                         if relics_on_way != 0:
