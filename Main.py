@@ -78,20 +78,12 @@ while is_running:
         p_inside = True
 
         while p_inside:
+
             if len(players_inside) == 0:
                 p_inside = False
-            if len(p_cards) == 0:
-                print("You are out of cards!")
-                for o in range(len(players_inside)):
-                    players_inside[o].go_home()
 
             else:
                 new_card = draw_card()
-                print(f"The drawn card was a {new_card}")
-                if new_card in treasure_cards and len(players_inside) != 0:
-                    diamonds_on_way += new_card % len(players_inside)
-                if new_card in relics:
-                    relics_on_way += int(new_card)
                 if new_card in traps:
                     if new_card in played_cards:
                         print(f"Oh no! It's the second {new_card}")
@@ -100,12 +92,16 @@ while is_running:
                             p.die()
                         p_inside = False
                         continue
+                print(f"The drawn card was a {new_card}")
+                if new_card in treasure_cards and len(players_inside) != 0:
+                    diamonds_on_way += new_card % len(players_inside)
+                if new_card in relics:
+                    relics_on_way += int(new_card)
                 for i in range(len(players_inside)):
                     if new_card in traps:
-                        if not new_card in played_cards:
-                            if relics_on_way != 0:
-                                print(f"There are relics worth {relics_on_way} diamonds on the way")
-                            players_inside[i].ask_question(diamonds_on_way)
+                        if relics_on_way != 0:
+                            print(f"There are relics worth {relics_on_way} diamonds on the way")
+                        players_inside[i].ask_question(diamonds_on_way)
 
                     elif new_card in treasure_cards:
                         players_inside[i].pocket += new_card // len(players_inside)
@@ -133,13 +129,15 @@ while is_running:
 
         played_cards.clear()
         players_inside.clear()
-        players_inside = _player.players.copy()
+        for p in _player.players:
+            p.inside = True
+        players_inside = [p for p in _player.players if p.inside]
         diamonds_on_way = 0
         relics_on_way = 0
         p_cards = cards.copy()
 
-
     for s in _player.players:
-        print(f"{s.player_name} earned {s.chest} Diamonds")
+        print(f"{s.player_name} collected {s.chest} Diamonds")
 
     is_running = False
+
