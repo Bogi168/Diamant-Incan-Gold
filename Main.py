@@ -87,16 +87,18 @@ while is_running:
 
             else:
                 new_card = draw_card()
-                if new_card in traps:
-                    if new_card in played_cards:
+                if new_card in traps and new_card in played_cards:
+                    print()
+                    print(f"Oh no! It's the second {new_card}")
+                    print("All the players inside lose their diamonds!")
+                    if rounds == 5-1:
                         print()
-                        print(f"Oh no! It's the second {new_card}")
-                        print("All the players inside lose their diamonds!")
-                        cards.remove(new_card)
-                        for p in players_inside:
-                            p.die()
-                        p_inside = False
-                        continue
+                        print("_____________________________________________________________")
+                    cards.remove(new_card)
+                    for p in players_inside:
+                        p.die()
+                    p_inside = False
+                    continue
                 print()
                 print(f"The drawn card was a {new_card}")
                 print()
@@ -170,4 +172,3 @@ while is_running:
                 print(winner.player_name, end=", ")
     print("*************************************************************")
     is_running = False
-
