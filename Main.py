@@ -1,11 +1,11 @@
 import random
 
 #Karten
-snakes = ["snake", "snake", "snake"]
-spiders = ["spider", "spider", "spider"]
-fires = ["fire", "fire", "fire"]
-avalanches = ["avalanche", "avalanche", "avalanche"]
-mummys = ["mummy", "mummy", "mummy"]
+snakes = ["🐍", "🐍", "🐍"]
+spiders = ["🕷", "🕷", "🕷"]
+fires = ["🔥", "🔥", "🔥"]
+avalanches = ["🌑", "🌑", "🌑"]
+mummys = ["👤", "👤", "👤"]
 treasure_cards = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9]
 relics = [4.01, 6.01, 8.01, 11.01, 14.01]
 traps = []
