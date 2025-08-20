@@ -87,7 +87,7 @@ def tell_new_card():
     print(f"The drawn card was a {new_card}")
     print()
 
-def share_diamonds(diamonds_on_way):
+def share_diamonds_on_way(diamonds_on_way):
     for homer in _player.go_home_now:
         homer.chest += diamonds_on_way // len(_player.go_home_now)
 
@@ -118,8 +118,13 @@ def tell_result():
     print("*************************************************************")
     print()
 
-while is_running:
+def tell_played_cards():
+    print()
+    print("Played Cards: ", end="")
+    for played_card in played_cards:
+        print(played_card, end=" ")
 
+while is_running:
     for rounds in range(5):
         card = p_relics[rounds]
         cards.append(card)
@@ -161,18 +166,20 @@ while is_running:
                         print("_____________________________________________________________")
                         print(f"There are relics worth {relics_on_way} diamonds on the way")
                         players_inside[i].ask_question(diamonds_on_way)
-            if len(_player.go_home_now) != 0 and p_inside:
-                share_diamonds(diamonds_on_way)
-                diamonds_on_way %= len(_player.go_home_now)
-            if relics_on_way != 0 and p_inside and len(_player.go_home_now) == 1:
-                _player.go_home_now[0].chest += relics_on_way
-                relics_on_way = 0
-            _player.go_home_now.clear()
 
-            if p_inside:
+                if len(_player.go_home_now) != 0:
+                    share_diamonds_on_way(diamonds_on_way)
+                    diamonds_on_way %= len(_player.go_home_now)
+
+                if relics_on_way != 0 and len(_player.go_home_now) == 1:
+                    _player.go_home_now[0].chest += relics_on_way
+                    relics_on_way = 0
+
+                _player.go_home_now.clear()
                 players_inside = [p for p in _player.players if p.inside]
                 played_cards.append(new_card)
 
+                tell_played_cards()
 
         played_cards.clear()
         players_inside.clear()
