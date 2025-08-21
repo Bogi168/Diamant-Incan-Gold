@@ -29,23 +29,3 @@ class Player:
         print("_____________________________________________________________")
         if question == "Y":
             self.go_home()
-
-#Test
-
-players = []
-print("****************************************")
-print("* Welcome to Incan Gold - Bogi Edition *")
-print("****************************************")
-print()
-players_amount = input("How many players? ")
-while not players_amount.isdigit() or int(players_amount) <= 0:
-    players_amount = input("That's not a valid number. How many players? ")
-print()
-print("________________________________________")
-players_amount= int(players_amount)
-
-for player_num in range(players_amount):
-    player_name = input(f"Enter player number {player_num+1}'s name: ").capitalize()
-    players.append(player_name)
-    print("________________________________________")
-players = [Player(players[i]) for i in range(len(players))]
