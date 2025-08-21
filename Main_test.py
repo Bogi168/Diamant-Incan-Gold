@@ -10,45 +10,11 @@ avalanches = ["🌑", "🌑", "🌑"]
 mummys = ["👤", "👤", "👤"]
 treasure_cards = [1, 2, 3, 4, 5, 5, 7, 7, 9, 11, 11, 13, 14, 15, 17]
 relics = [5.01, 7.01, 8.01, 10.01, 12.01]
-traps = []
-cards = []
+traps = ([snake for snake in snakes] + [spider for spider in spiders] + [fire for fire in fires] +
+         [avalanche for avalanche in avalanches] + [mummy for mummy in mummys])
+cards = [trap for trap in traps] + [treasure_card for treasure_card in treasure_cards]
 players = []
-
-def create_deck():
-    for snake in snakes:
-        card = snake
-        traps.append(card)
-    for spider in spiders:
-        card = spider
-        traps.append(card)
-    for fire in fires:
-        card = fire
-        traps.append(card)
-    for avalanche in avalanches:
-        card = avalanche
-        traps.append(card)
-    for mummy in mummys:
-        card = mummy
-        traps.append(card)
-
-    for snake in snakes:
-        card = snake
-        cards.append(card)
-    for spider in spiders:
-        card = spider
-        cards.append(card)
-    for fire in fires:
-        card = fire
-        cards.append(card)
-    for avalanche in avalanches:
-        card = avalanche
-        cards.append(card)
-    for mummy in mummys:
-        card = mummy
-        cards.append(card)
-    for treasure in treasure_cards:
-        card = treasure
-        cards.append(card)
+bots = []
 
 def start_game():
     print("****************************************")
@@ -71,6 +37,27 @@ def create_players():
     c_players = [_player.Player(c_players[i]) for i in range(len(c_players))]
     return c_players
 
+def create_bots():
+    print()
+    bots_amount = input("How many bots? ")
+    while not bots_amount.isdigit() or int(bots_amount) < 0:
+        bots_amount = input("That's not a valid number. How many bots? ")
+    print()
+    print("________________________________________")
+    bots_amount = int(bots_amount)
+    if bots_amount != 0:
+        level_bots = int(input("Select a level for the bots (careful: 1 / medium: 2 / risky: 3): "))
+        while not level_bots == 1 and not level_bots == 2 and not level_bots == 3:
+            print(f"{level_bots} is not valid. Select a level for the bots")
+            level_bots = int(input("(careful: 1 / medium: 2 / risky: 3): "))
+        c_bots = []
+        for bots_num in range(bots_amount):
+            c_bots.append(f"Bot {bots_num + 1}")
+        c_bots = [_player.Bot(c_bots[i], level_bots) for i in range(len(c_bots))]
+        return c_bots
+
+
+
 class Game:
     def __init__(self):
         # Spiel
@@ -81,6 +68,8 @@ class Game:
         self.diamonds_on_way = 0
         self.relics_on_way = 0
         self.players_inside = [p for p in players if p.inside]
+        if bots != None:
+            self.players_inside += [b for b in bots if b.inside]
         self.p_relics = relics.copy()
         self.winners = []
 
@@ -91,8 +80,8 @@ class Game:
         print("****************************************")
 
     def draw_card(self):
-        drawn = random.choice(self.p_cards)
-        self.p_cards.remove(drawn)
+        drawn = random.choice(self.deck)
+        self.deck.remove(drawn)
         return drawn
 
     def sec_trap(self):
@@ -117,6 +106,10 @@ class Game:
             for homer in _player.go_home_now:
                 homer.chest += self.diamonds_on_way // len(_player.go_home_now)
             self.diamonds_on_way %= len(_player.go_home_now)
+
+    def tell_relics_on_way(self):
+        if self.relics_on_way != 0:
+            print(f"There are relics worth {self.relics_on_way} diamonds on the way")
 
     def tell_result(self):
         d_winner = 0
@@ -152,17 +145,20 @@ class Game:
             print(played_card, end=" ")
         print()
 
-    def tell_probability(self):
+    def calc_prob(self):
         killing_traps = 0
         probability = 0
         self.played_cards.append(self.new_card)
         for card in self.played_cards:
             if card in traps:
-                traps_in_game = self.p_cards.count(card)
+                traps_in_game = self.deck.count(card)
                 killing_traps += traps_in_game
-        probability += killing_traps / len(self.p_cards)
+        probability += killing_traps / len(self.deck)
         self.played_cards.pop(-1)
-        return f"The probability of dying in the next move is {probability*100:.1f}%"
+        return probability
+
+    def tell_probability(self):
+        return f"The probability of dying in the next move is {self.calc_prob()*100:.1f}%"
 
     def act_on_card(self):
         if self.new_card in treasure_cards and len(self.players_inside) != 0:
@@ -173,30 +169,37 @@ class Game:
         for i in range(len(self.players_inside)):
             if self.new_card in traps:
                 print("_____________________________________________________________")
-                if self.relics_on_way != 0:
-                    print(f"There are relics worth {self.relics_on_way} diamonds on the way")
                 print()
                 print(self.tell_probability())
                 print()
-                self.players_inside[i].ask_question(self.diamonds_on_way)
+                self.tell_relics_on_way()
+                if not self.players_inside[i].is_bot:
+                    self.players_inside[i].ask_player(self.diamonds_on_way)
+                elif bots != None and self.players_inside[i].is_bot:
+                    self.players_inside[i].ask_bot(self.diamonds_on_way, self.calc_prob())
 
             elif self.new_card in treasure_cards:
                 print("_____________________________________________________________")
                 self.players_inside[i].pocket += self.new_card // len(self.players_inside)
-                if self.relics_on_way != 0:
-                    print(f"There are relics worth {self.relics_on_way} diamonds on the way")
                 print()
                 print(self.tell_probability())
                 print()
-                self.players_inside[i].ask_question(self.diamonds_on_way)
+                self.tell_relics_on_way()
+                if not self.players_inside[i].is_bot:
+                    self.players_inside[i].ask_player(self.diamonds_on_way)
+                elif bots != None and self.players_inside[i].is_bot:
+                    self.players_inside[i].ask_bot(self.diamonds_on_way, self.calc_prob())
 
             elif self.new_card in relics:
                 print("_____________________________________________________________")
-                print(f"There are relics worth {self.relics_on_way} diamonds on the way")
                 print()
                 print(self.tell_probability())
                 print()
-                self.players_inside[i].ask_question(self.diamonds_on_way)
+                self.tell_relics_on_way()
+                if not self.players_inside[i].is_bot:
+                    self.players_inside[i].ask_player(self.diamonds_on_way)
+                elif bots != None and self.players_inside[i].is_bot:
+                    self.players_inside[i].ask_bot(self.diamonds_on_way, self.calc_prob())
 
     def earn_relics(self):
         if self.relics_on_way != 0 and len(_player.go_home_now) == 1:
@@ -208,10 +211,15 @@ class Game:
         self.players_inside.clear()
         for p in players:
             p.inside = True
+        if bots != None:
+            for b in bots:
+                b.inside = True
         self.players_inside = [p for p in players if p.inside]
+        if bots != None:
+            self.players_inside += [b for b in bots if b.inside]
         self.diamonds_on_way = 0
         self.relics_on_way = 0
-        self.p_cards = cards.copy()
+        self.deck = cards.copy()
 
     def ask_again(self):
         play_again = input("Do you want to play again? (Y/N) ").upper()
@@ -221,13 +229,15 @@ class Game:
     def main(self):
         while self.is_running:
             for self.rounds in range(5):
+                #Add relics
                 card = self.p_relics[self.rounds]
                 cards.append(card)
-                self.p_cards = cards.copy()
+                self.deck = cards.copy()
+                #Start Round
                 self.tell_round()
                 self.p_inside = True
                 while self.p_inside:
-
+                    #No players inside
                     if len(self.players_inside) == 0:
                         self.p_inside = False
 
@@ -242,6 +252,8 @@ class Game:
                         self.earn_relics()
                         _player.go_home_now.clear()
                         self.players_inside = [p for p in players if p.inside]
+                        if bots != None:
+                            self.players_inside += [b for b in bots if b.inside]
                         self.played_cards.append(self.new_card)
                         self.tell_played_cards()
 
@@ -251,8 +263,8 @@ class Game:
             self.ask_again()
 
 if __name__ == "__main__":
-    create_deck()
     start_game()
     players = create_players()
+    bots = create_bots()
     game = Game()
     game.main()
