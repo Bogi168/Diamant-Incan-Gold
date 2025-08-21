@@ -92,15 +92,18 @@ class WelcWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Incan Gold")
-        self.setGeometry(600,150,800,800)
+        self.setGeometry(450,100,700,700)
         self.setWindowIcon(QIcon("Icon.png"))
         dia_image = QLabel(self)
-        dia_image.setGeometry(0,0,self.width(),self.height())
+        dia_image.setGeometry(0,
+                              0,
+                              self.width(),
+                              self.height())
         pixmap = QPixmap("Icon.png")
         dia_image.setPixmap(pixmap)
         dia_image.setScaledContents(True)
         welc_txt = QLabel("Welcome to Incan Gold", self)
-        welc_txt.setGeometry(0, 30, 800, 60)
+        welc_txt.setGeometry(0, 30, 700, 60)
         welc_txt.setGeometry((self.width() - welc_txt.width()) // 2,
                             welc_txt.y(),
                             self.width(),
@@ -112,7 +115,7 @@ class WelcWindow(QMainWindow):
         welc_txt.setAlignment(Qt.AlignCenter)
 
         bogi_edition = QLabel("Bogi Edition", self)
-        bogi_edition.setGeometry(0, 0, 800, 50)
+        bogi_edition.setGeometry(0, 0, 700, 50)
         bogi_edition.setGeometry((self.width() - bogi_edition.width()) // 2,
                              welc_txt.height() + welc_txt.y(),
                              self.width(),
@@ -133,6 +136,9 @@ class WelcWindow(QMainWindow):
                                 self.button.width(),
                                 self.button.height())
         self.button.setFont(QFont("Arial", 20))
+        self.button.setStyleSheet("color: #292929;"
+                                   "background-color: #e1e3e1;"
+                                   "font-weight: bold;")
         self.button.clicked.connect(self.on_click)
 
     def on_click(self):
@@ -144,7 +150,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Incan Gold")
-        self.setGeometry(0,0,1910,990)
+        self.setGeometry(0,0,1550,800)
         self.setWindowIcon(QIcon("Icon.png"))
         self.but_go_home = QPushButton("Go Home", self)
         self.but_stay_in = QPushButton("Stay Inside", self)
@@ -153,17 +159,18 @@ class MainWindow(QMainWindow):
     def initUI(self):
         self.but_go_home.setGeometry(150, 200, 300, 100)
         self.but_go_home.setFont(QFont("Arial", 20))
-        self.but_go_home.clicked.connect(self.go_home())
+        self.but_go_home.clicked.connect(self.go_home)
 
         self.but_stay_in.setGeometry(150, 200, 300, 100)
         self.but_stay_in.setFont(QFont("Arial", 20))
-        self.but_stay_in.clicked.connect(self.stay_in())
+        self.but_stay_in.clicked.connect(self.stay_in)
 
     def go_home(self):
-        pass
+        print("Go Home")
 
     def stay_in(self):
-        pass
+        print("Stay Inside")
+
 
 #main
 def main():
