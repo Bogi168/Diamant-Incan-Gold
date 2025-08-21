@@ -152,6 +152,18 @@ class Game:
             print(played_card, end=" ")
         print()
 
+    def tell_probability(self):
+        killing_traps = 0
+        probability = 0
+        self.played_cards.append(self.new_card)
+        for card in self.played_cards:
+            if card in traps:
+                traps_in_game = self.p_cards.count(card)
+                killing_traps += traps_in_game
+        probability += killing_traps / len(self.p_cards)
+        self.played_cards.pop(-1)
+        return f"The probability of dying in the next move is {probability*100:.1f}%"
+
     def act_on_card(self):
         if self.new_card in treasure_cards and len(self.players_inside) != 0:
             self.diamonds_on_way += self.new_card % len(self.players_inside)
@@ -163,6 +175,9 @@ class Game:
                 print("_____________________________________________________________")
                 if self.relics_on_way != 0:
                     print(f"There are relics worth {self.relics_on_way} diamonds on the way")
+                print()
+                print(self.tell_probability())
+                print()
                 self.players_inside[i].ask_question(self.diamonds_on_way)
 
             elif self.new_card in treasure_cards:
@@ -170,12 +185,19 @@ class Game:
                 self.players_inside[i].pocket += self.new_card // len(self.players_inside)
                 if self.relics_on_way != 0:
                     print(f"There are relics worth {self.relics_on_way} diamonds on the way")
+                print()
+                print(self.tell_probability())
+                print()
                 self.players_inside[i].ask_question(self.diamonds_on_way)
 
             elif self.new_card in relics:
                 print("_____________________________________________________________")
                 print(f"There are relics worth {self.relics_on_way} diamonds on the way")
+                print()
+                print(self.tell_probability())
+                print()
                 self.players_inside[i].ask_question(self.diamonds_on_way)
+
     def earn_relics(self):
         if self.relics_on_way != 0 and len(_player.go_home_now) == 1:
             _player.go_home_now[0].chest += self.relics_on_way
@@ -190,7 +212,7 @@ class Game:
         self.diamonds_on_way = 0
         self.relics_on_way = 0
         self.p_cards = cards.copy()
-        
+
     def ask_again(self):
         play_again = input("Do you want to play again? (Y/N) ").upper()
         if play_again != "Y":
