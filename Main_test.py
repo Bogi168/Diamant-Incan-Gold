@@ -55,7 +55,7 @@ def start_game():
     print("* Welcome to Incan Gold - Bogi Edition *")
     print("****************************************")
     print()
-    
+
 def create_players():
     players_amount = input("How many players? ")
     while not players_amount.isdigit() or int(players_amount) <= 0:
@@ -105,16 +105,18 @@ class Game:
         cards.remove(self.new_card)
         for p in self.players_inside:
             p.die()
+        self.p_inside = False
 
     def tell_new_card(self):
         print()
         print(f"The drawn card was a {self.new_card}")
         print()
 
-    def share_diamonds_on_way(self):
-        for homer in _player.go_home_now:
-            homer.chest += self.diamonds_on_way // len(_player.go_home_now)
-        self.diamonds_on_way %= len(_player.go_home_now)
+    def split_diamonds_on_way(self):
+        if len(_player.go_home_now) != 0:
+            for homer in _player.go_home_now:
+                homer.chest += self.diamonds_on_way // len(_player.go_home_now)
+            self.diamonds_on_way %= len(_player.go_home_now)
 
     def tell_result(self):
         d_winner = 0
@@ -150,7 +152,36 @@ class Game:
             print(played_card, end=" ")
         print()
 
-    def reset(self):
+    def act_on_card(self):
+        if self.new_card in treasure_cards and len(self.players_inside) != 0:
+            self.diamonds_on_way += self.new_card % len(self.players_inside)
+        if self.new_card in relics:
+            self.relics_on_way += int(self.new_card)
+            cards.remove(self.new_card)
+        for i in range(len(self.players_inside)):
+            if self.new_card in traps:
+                print("_____________________________________________________________")
+                if self.relics_on_way != 0:
+                    print(f"There are relics worth {self.relics_on_way} diamonds on the way")
+                self.players_inside[i].ask_question(self.diamonds_on_way)
+
+            elif self.new_card in treasure_cards:
+                print("_____________________________________________________________")
+                self.players_inside[i].pocket += self.new_card // len(self.players_inside)
+                if self.relics_on_way != 0:
+                    print(f"There are relics worth {self.relics_on_way} diamonds on the way")
+                self.players_inside[i].ask_question(self.diamonds_on_way)
+
+            elif self.new_card in relics:
+                print("_____________________________________________________________")
+                print(f"There are relics worth {self.relics_on_way} diamonds on the way")
+                self.players_inside[i].ask_question(self.diamonds_on_way)
+    def earn_relics(self):
+        if self.relics_on_way != 0 and len(_player.go_home_now) == 1:
+            _player.go_home_now[0].chest += self.relics_on_way
+            self.relics_on_way = 0
+
+    def reset_round(self):
         self.played_cards.clear()
         self.players_inside.clear()
         for p in players:
@@ -159,6 +190,11 @@ class Game:
         self.diamonds_on_way = 0
         self.relics_on_way = 0
         self.p_cards = cards.copy()
+        
+    def ask_again(self):
+        play_again = input("Do you want to play again? (Y/N) ").upper()
+        if play_again != "Y":
+            self.is_running = False
 
     def main(self):
         while self.is_running:
@@ -177,55 +213,20 @@ class Game:
                         self.new_card = self.draw_card()
                         if self.new_card in traps and self.new_card in self.played_cards:
                             self.sec_trap()
-                            self.p_inside = False
                             continue
                         self.tell_new_card()
-                        if self.new_card in treasure_cards and len(self.players_inside) != 0:
-                            self.diamonds_on_way += self.new_card % len(self.players_inside)
-                        if self.new_card in relics:
-                            self.relics_on_way += int(self.new_card)
-                            cards.remove(self.new_card)
-                        for i in range(len(self.players_inside)):
-                            if self.new_card in traps:
-                                print("_____________________________________________________________")
-                                if self.relics_on_way != 0:
-                                    print(f"There are relics worth {self.relics_on_way} diamonds on the way")
-                                self.players_inside[i].ask_question(self.diamonds_on_way)
-
-                            elif self.new_card in treasure_cards:
-                                print("_____________________________________________________________")
-                                self.players_inside[i].pocket += self.new_card // len(self.players_inside)
-                                if self.relics_on_way != 0:
-                                    print(f"There are relics worth {self.relics_on_way} diamonds on the way")
-                                self.players_inside[i].ask_question(self.diamonds_on_way)
-
-                            elif self.new_card in relics:
-                                print("_____________________________________________________________")
-                                print(f"There are relics worth {self.relics_on_way} diamonds on the way")
-                                self.players_inside[i].ask_question(self.diamonds_on_way)
-
-                        if len(_player.go_home_now) != 0:
-                            self.share_diamonds_on_way()
-
-                        if self.relics_on_way != 0 and len(_player.go_home_now) == 1:
-                            _player.go_home_now[0].chest += self.relics_on_way
-                            self.relics_on_way = 0
-
+                        self.act_on_card()
+                        self.split_diamonds_on_way()
+                        self.earn_relics()
                         _player.go_home_now.clear()
                         self.players_inside = [p for p in players if p.inside]
                         self.played_cards.append(self.new_card)
-
                         self.tell_played_cards()
 
-                self.reset()
+                self.reset_round()
 
             self.tell_result()
-
-            play_again = input("Do you want to play again? (Y/N) ").upper()
-            if play_again == "Y":
-                self.is_running = True
-            else:
-                self.is_running = False
+            self.ask_again()
 
 if __name__ == "__main__":
     create_deck()
