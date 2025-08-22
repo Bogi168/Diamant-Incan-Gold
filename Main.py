@@ -32,6 +32,7 @@ class Game:
         self.relics_on_way = 0
 
         # Define card lists
+        self.deck = []
         self.played_cards = []
         self.players_inside = []
         self.p_relics = self.relics.copy()
@@ -97,24 +98,62 @@ class Game:
         print(f"*               Round: {(self.rounds + 1)}               *")
         print("****************************************")
 
+    # Reset previous round
+    def reset_round(self):
+        self.played_cards.clear()
+        self.players_inside.clear()
+        for p in self.explorers:
+            p.inside = True
+        self.players_inside = [p for p in self.explorers if p.inside]
+        self.diamonds_on_way = 0
+        self.relics_on_way = 0
+        self.deck = self.cards.copy()
+
+    # Start Round
+    def start_round(self):
+        self.reset_round()
+        relic = self.p_relics[self.rounds]
+        self.cards.append(relic)
+        self.deck = self.cards.copy()
+        self.tell_round()
+        self.p_inside = True
+
+    # Check whether payers inside
+    def no_players_inside(self):
+        if len(self.players_inside) == 0:
+            self.p_inside = False
+            return True
+        else:
+            return False
+
     # Draw cards
     def draw_card(self):
-        drawn = random.choice(self.deck)
-        self.deck.remove(drawn)
-        return drawn
+        self.new_card = random.choice(self.deck)
+        self.deck.remove(self.new_card)
+
+    # Check whether it is the second trap
+    def check_second_trap(self):
+        if self.new_card in self.traps and self.new_card in self.played_cards:
+            return True
+        else:
+            return False
 
     # Second trap
     def sec_trap(self):
-        print()
-        print(f"Oh no! It's the second {self.new_card}")
-        print("All the players inside lose their diamonds!")
-        if self.rounds == 5 - 1:
+        if self.check_second_trap():
             print()
-            print("_____________________________________________________________")
-        self.cards.remove(self.new_card)
-        for p in self.players_inside:
-            p.die()
-        self.p_inside = False
+            print(f"Oh no! It's the second {self.new_card}")
+            print("All the players inside lose their diamonds!")
+            if self.rounds == 5 - 1:
+                print()
+                print("_____________________________________________________________")
+            self.cards.remove(self.new_card)
+            for p in self.players_inside:
+                p.die()
+            self.p_inside = False
+            return True
+        else:
+            return False
 
     # Calculate probability of dying on the next move
     def calc_prob(self):
@@ -181,6 +220,13 @@ class Game:
             print()
             self.tell_relics_on_way()
 
+    # Ask the player / bot what he wants to do
+    def ask_explorer(self, i):
+        if not self.players_inside[i].is_bot:
+            self.players_inside[i].ask_player(self.diamonds_on_way, self.go_home_now)
+        elif len(self.bots) != 0 and self.players_inside[i].is_bot:
+            self.players_inside[i].ask_bot(self.diamonds_on_way, self.relics_on_way, self.calc_prob(), self.go_home_now)
+
     # Take action based on the drawn card
     def act_on_card(self):
         self.new_in_treasure_cards_1()
@@ -190,13 +236,6 @@ class Game:
             self.new_in_treasure_cards_2(i)
             self.new_in_relics_2()
             self.ask_explorer(i)
-
-    # Ask the player / bot what he wants to do
-    def ask_explorer(self, i):
-        if not self.players_inside[i].is_bot:
-            self.players_inside[i].ask_player(self.diamonds_on_way, self.go_home_now)
-        elif len(self.bots) != 0 and self.players_inside[i].is_bot:
-            self.players_inside[i].ask_bot(self.diamonds_on_way, self.relics_on_way, self.calc_prob(), self.go_home_now)
 
     # Put share of diamonds on the way into the home going player's chests
     def split_diamonds_on_way(self):
@@ -219,16 +258,24 @@ class Game:
             print(played_card, end=" ")
         print()
 
-    # Prepare next round
-    def reset_round(self):
-        self.played_cards.clear()
-        self.players_inside.clear()
-        for p in self.explorers:
-            p.inside = True
-        self.players_inside = [p for p in self.explorers if p.inside]
-        self.diamonds_on_way = 0
-        self.relics_on_way = 0
-        self.deck = self.cards.copy()
+    # Card is not the second trap
+    def not_sec_traps(self):
+        if not self.check_second_trap():
+            self.tell_new_card()
+            self.act_on_card()
+            self.split_diamonds_on_way()
+            self.earn_relics()
+            self.go_home_now.clear()
+            self.players_inside = [p for p in self.explorers if p.inside]
+            self.played_cards.append(self.new_card)
+            self.tell_played_cards()
+
+    # Still players inside
+    def still_players_inside(self):
+        if not self.no_players_inside():
+            self.draw_card()
+            self.sec_trap()
+            self.not_sec_traps()
 
     # Find the winner
     def identify_winner(self):
@@ -279,41 +326,21 @@ class Game:
         else:
             self.is_running = False
 
+    # Play 5 rounds
+    def play_rounds(self):
+        for self.rounds in range(5):
+            self.start_round()
+            while self.p_inside:
+                self.no_players_inside()
+                self.still_players_inside()
+        self.tell_result()
+        self.ask_again()
+    # Main method
     def main(self):
         self.start_game()
         self.create_explorers()
         while self.is_running:
-            for self.rounds in range(5):
-                #Add relics
-                card = self.p_relics[self.rounds]
-                self.cards.append(card)
-                self.deck = self.cards.copy()
-                #Start Round
-                self.tell_round()
-                self.p_inside = True
-                while self.p_inside:
-                    #No players inside
-                    if len(self.players_inside) == 0:
-                        self.p_inside = False
-
-                    else:
-                        self.new_card = self.draw_card()
-                        if self.new_card in self.traps and self.new_card in self.played_cards:
-                            self.sec_trap()
-                            continue
-                        self.tell_new_card()
-                        self.act_on_card()
-                        self.split_diamonds_on_way()
-                        self.earn_relics()
-                        self.go_home_now.clear()
-                        self.players_inside = [p for p in self.explorers if p.inside]
-                        self.played_cards.append(self.new_card)
-                        self.tell_played_cards()
-
-                self.reset_round()
-
-            self.tell_result()
-            self.ask_again()
+            self.play_rounds()
 
 if __name__ == "__main__":
     game = Game()
