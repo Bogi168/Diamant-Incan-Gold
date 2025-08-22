@@ -31,7 +31,7 @@ class Player:
         if question == "Y":
             self.go_home()
 
-    def ask_bot(self, diamonds_on_way, probability):
+    def ask_bot(self, diamonds_on_way, relics_on_way, probability):
         pass
 
 class Bot(Player):
@@ -43,12 +43,12 @@ class Bot(Player):
     def tell_b_pocket(self):
         print(f"{self.bot_name} has {self.pocket} diamond(s) in his pocket")
 
-    def ask_bot(self, diamonds_on_way, probability):
+    def ask_bot(self, diamonds_on_way, relics_on_way, probability):
         self.tell_b_pocket()
         print(f"There is/are {diamonds_on_way} diamond(s) on the way home")
         print("_____________________________________________________________")
         if self.level == 1:
-            if probability > 0.1:
+            if probability > 0.1 and (diamonds_on_way + relics_on_way + self.pocket) != 0:
                 self.go_home()
                 print(f"{self.bot_name} goes home and saves his diamond(s)")
                 print("_____________________________________________________________")
@@ -56,7 +56,7 @@ class Bot(Player):
                 print(f"{self.bot_name} stays inside")
                 print("_____________________________________________________________")
         elif self.level == 2:
-            if probability > 0.17:
+            if probability > 0.17 and (diamonds_on_way + relics_on_way + self.pocket) != 0:
                 self.go_home()
                 print(f"{self.bot_name} goes home and saves his diamond(s)")
                 print("_____________________________________________________________")
@@ -64,7 +64,7 @@ class Bot(Player):
                 print(f"{self.bot_name} stays inside")
                 print("_____________________________________________________________")
         elif self.level == 3:
-            if probability > 0.25:
+            if probability > 0.25 and (diamonds_on_way + relics_on_way + self.pocket) != 0:
                 self.go_home()
                 print(f"{self.bot_name} goes home and saves his diamond(s)")
                 print("_____________________________________________________________")
