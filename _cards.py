@@ -7,10 +7,10 @@ class Cards:
         self.spiders = ["🕷"] * 3
         self.fires = ["🔥"] * 3
         self.avalanches = ["🌑"] * 3
-        self.mummys = ["👤"] * 3
+        self.mummies = ["👤"] * 3
         self.treasure_cards = [1, 2, 3, 4, 5, 5, 7, 7, 9, 11, 11, 13, 14, 15, 17]
         self.relics = [5.01, 7.01, 8.01, 10.01, 12.01]
-        self.traps = self.snakes + self.spiders + self.fires + self.avalanches + self.mummys
+        self.traps = self.snakes + self.spiders + self.fires + self.avalanches + self.mummies
         self.full_deck = self.traps + self.treasure_cards
 
         # Define card lists
@@ -29,6 +29,7 @@ class Cards:
         self.new_card = random.choice(self.deck)
         self.deck.remove(self.new_card)
 
+    # Add relics
     def add_relics(self, round_num):
         relic = self.p_relics[round_num]
         self.full_deck.append(relic)
