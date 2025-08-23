@@ -38,7 +38,7 @@ class Player:
             self.go_home(e_go_home_now)
 
     # empty method for Bot
-    def ask_bot(self, diamonds_on_way, relics_on_way, probability, e_go_home_now):
+    def ask_bot(self, diamonds_on_way, players_inside, cur_round, highest_diamonds, relics_on_way, probability, e_go_home_now):
         pass
 
 # Class Bot
@@ -48,6 +48,7 @@ class Bot(Player):
         super().__init__(player_name = bot_name, is_bot = True)
         self.level = level
         self.bot_name = bot_name
+        self.diamonds = 0
 
     # Present Bot's diamonds
     def tell_b_diamonds(self, diamonds_on_way):
@@ -65,6 +66,20 @@ class Bot(Player):
     def bot_stays_inside(self):
         print(f"{self.bot_name} stays inside")
         print("_____________________________________________________________")
+
+    def last_round_risk(self, diamonds_on_way, players_inside, cur_round, highest_diamonds):
+        self.diamonds = self.chest + self.pocket + (diamonds_on_way // len(players_inside))
+        if cur_round == 4 and highest_diamonds == 0:
+            pass
+        elif cur_round == 4 and (highest_diamonds - 20) <= self.diamonds < highest_diamonds:
+            self.level = 10
+        elif cur_round == 4 and self.diamonds == highest_diamonds:
+            self.level = 2
+        elif cur_round == 4 and self.diamonds < (highest_diamonds - 20):
+            self.level = 3
+
+
+
 
     # Bot level 1
     def bot_lvl1(self, diamonds_on_way, relics_on_way, probability, e_go_home_now):
@@ -90,9 +105,21 @@ class Bot(Player):
             else:
                 self.bot_stays_inside()
 
+    # Bot level last round
+    def bot_lvl_last(self, highest_diamonds):
+        if self.level == 10:
+            if (highest_diamonds - 20) <= self.diamonds < highest_diamonds:
+                self.bot_stays_inside()
+            elif self.diamonds == highest_diamonds:
+                self.level = 2
+            elif self.diamonds < (highest_diamonds - 20):
+                self.level = 3
+
     # Ask bot what he wants to do
-    def ask_bot(self, diamonds_on_way, relics_on_way, probability, e_go_home_now):
+    def ask_bot(self, diamonds_on_way, players_inside, cur_round, highest_diamonds, relics_on_way, probability, e_go_home_now):
         self.tell_b_diamonds(diamonds_on_way)
+        self.last_round_risk(diamonds_on_way, players_inside, cur_round, highest_diamonds)
+        self.bot_lvl_last(highest_diamonds)
         self.bot_lvl1(diamonds_on_way, relics_on_way, probability, e_go_home_now)
         self.bot_lvl2(diamonds_on_way, relics_on_way, probability, e_go_home_now)
         self.bot_lvl3(diamonds_on_way, relics_on_way, probability, e_go_home_now)
