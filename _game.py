@@ -5,11 +5,14 @@ from _cards import Cards
 # Game
 class Game:
     def __init__(self):
-        # Define players
+        # Define explorer lists
         self.players = []
         self.level_bots = []
         self.bots = []
         self.explorers = []
+        self.players_inside = []
+        self.go_home_now = []
+        self.final_winners = []
 
         # Define Game variables
         self.is_running = True
@@ -17,18 +20,18 @@ class Game:
         self.p_inside = True
         self.diamonds_on_way = 0
         self.relics_on_way = 0
+        self.amount_current_winner = 0
+        self.amount_final_winner = 0
 
-        # Define explorer lists
-        self.players_inside = []
-        self.go_home_now = []
-        self.winners = []
 
         # Create cards object
         self.cards = Cards()
 
 
     # Welcome text
-    def start_game(self):
+    @staticmethod
+    def welcome_txt():
+        print()
         print("****************************************")
         print("* Welcome to Incan Gold - Bogi Edition *")
         print("****************************************")
@@ -161,6 +164,14 @@ class Game:
         if self.relics_on_way != 0:
             print(f"There are relics worth {self.relics_on_way} diamonds on the way")
 
+    # Identify diamonds of current winner
+    def identify_highest_diamonds(self):
+        self.amount_current_winner = 0
+        for c in self.explorers:
+            c_diamonds = c.chest + c.pocket + (self.diamonds_on_way // len(self.players_inside))
+            if self.amount_current_winner <= c_diamonds:
+                self.amount_current_winner = c_diamonds
+
     # First trap
     def new_in_traps(self):
         if self.cards.new_card in self.cards.traps:
@@ -171,12 +182,12 @@ class Game:
             self.tell_relics_on_way()
 
     # Put remainder of treasure card on the way
-    def new_in_treasure_cards_1(self):
-        if self.cards.new_card in self.cards.treasure_cards and len(self.players_inside) != 0:
+    def add_treasure_card_remainder_to_way(self):
+        if self.cards.new_card in self.cards.treasure_cards:
             self.diamonds_on_way += self.cards.new_card % len(self.players_inside)
 
     # Put share of treasure card in pocket
-    def new_in_treasure_cards_2(self, i):
+    def new_in_treasure_cards(self, i):
         if self.cards.new_card in self.cards.treasure_cards:
             print("_____________________________________________________________")
             self.players_inside[i].pocket += self.cards.new_card // len(self.players_inside)
@@ -186,13 +197,13 @@ class Game:
             self.tell_relics_on_way()
 
     # Put relics on the way
-    def new_in_relics_1(self):
+    def add_relics_to_relics_on_way(self):
         if self.cards.new_card in self.cards.relics:
             self.relics_on_way += int(self.cards.new_card)
             self.cards.full_deck.remove(self.cards.new_card)
 
     # Tell the amount of relics on the way
-    def new_in_relics_2(self):
+    def new_in_relics(self):
         if self.cards.new_card in self.cards.relics:
             print("_____________________________________________________________")
             print()
@@ -205,16 +216,18 @@ class Game:
         if not self.players_inside[i].is_bot:
             self.players_inside[i].ask_player(self.diamonds_on_way, self.go_home_now)
         elif len(self.bots) != 0 and self.players_inside[i].is_bot:
-            self.players_inside[i].ask_bot(self.diamonds_on_way, self.relics_on_way, self.calc_prob(), self.go_home_now)
+            self.players_inside[i].ask_bot(self.diamonds_on_way, self.players_inside, self.rounds, self.amount_current_winner,
+                                           self.relics_on_way, self.calc_prob(), self.go_home_now)
 
     # Take action based on the drawn card
     def act_on_card(self):
-        self.new_in_treasure_cards_1()
-        self.new_in_relics_1()
+        self.add_treasure_card_remainder_to_way()
+        self.add_relics_to_relics_on_way()
+        self.identify_highest_diamonds()
         for i in range(len(self.players_inside)):
             self.new_in_traps()
-            self.new_in_treasure_cards_2(i)
-            self.new_in_relics_2()
+            self.new_in_treasure_cards(i)
+            self.new_in_relics()
             self.ask_explorer(i)
 
     # Put share of diamonds on the way into the home going player's chests
@@ -257,34 +270,34 @@ class Game:
             self.sec_trap()
             self.not_sec_traps()
 
-    # Find the winner
-    def identify_winner(self):
-        d_winner = 0
-        print()
-        print("_____________________________________________________________")
+    def identify_final_winner(self):
         for s in self.explorers:
-            print(f"{s.player_name} collected {s.chest} Diamonds")
-            if d_winner < s.chest:
-                d_winner = s.chest
-                self.winners.clear()
-                self.winners.append(s)
-            elif d_winner == s.chest:
-                self.winners.append(s)
-        print("_____________________________________________________________")
-        print()
+            if self.amount_final_winner < s.chest:
+                self.amount_final_winner = s.chest
+                self.final_winners.clear()
+                self.final_winners.append(s)
+            elif self.amount_final_winner == s.chest:
+                self.final_winners.append(s)
+
 
     # Present the result
     def tell_result(self):
-        self.identify_winner()
+        print()
+        print("_____________________________________________________________")
+        self.identify_final_winner()
+        for e in self.explorers:
+            print(f"{e.player_name} collected {e.chest} Diamonds")
+        print("_____________________________________________________________")
+        print()
         print("*************************************************************")
-        if len(self.winners) == 1:
-            print(f"The winner is: {self.winners[0].player_name}")
+        if len(self.final_winners) == 1:
+            print(f"The winner is: {self.final_winners[0].player_name}")
         else:
             print(f"The winners are: ", end = "")
-            for winner in self.winners:
-                if winner == self.winners[-1]:
+            for winner in self.final_winners:
+                if winner == self.final_winners[-1]:
                     print("& " + winner.player_name)
-                elif winner == self.winners[-2]:
+                elif winner == self.final_winners[-2]:
                     print(winner.player_name, end=" ")
                 else:
                     print(winner.player_name, end=", ")
@@ -293,21 +306,27 @@ class Game:
 
     # Reset the cards
     def reset_game(self):
-        self.cards.traps = self.cards.snakes + self.cards.spiders + self.cards.fires + self.cards.avalanches + self.cards.mummys
+        self.cards.traps = self.cards.snakes + self.cards.spiders + self.cards.fires + self.cards.avalanches + self.cards.mummies
         self.cards.full_deck = self.cards.traps + self.cards.treasure_cards
+        self.bots.clear()
+        self.level_bots.clear()
+        self.players.clear()
+        self.explorers.clear()
+        self.final_winners.clear()
+        print()
+        self.create_explorers()
 
     # Ask about playing again
     def ask_again(self):
         play_again = input("Do you want to play again? (Y/N) ").upper()
         if play_again == "Y":
             self.reset_game()
-            for e in self.explorers:
-                e.chest = 0
         else:
+            print()
             print("Thanks for playing!")
             self.is_running = False
 
-    # Play 5 rounds
+    # Play 5 rounds and ask about playing again
     def play_rounds(self):
         for self.rounds in range(5):
             self.start_round()
@@ -319,7 +338,7 @@ class Game:
 
     # Main method
     def main(self):
-        self.start_game()
+        Game.welcome_txt()
         self.create_explorers()
         while self.is_running:
             self.play_rounds()
