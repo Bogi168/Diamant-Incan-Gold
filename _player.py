@@ -1,3 +1,6 @@
+# Levels
+from LevelStrategy import Level_1, Level_2, Level_3, Level_Last_Round
+
 # Class Player
 class Player:
     def __init__(self, player_name, inside = True, pocket = 0, chest = 0, is_bot = False):
@@ -78,48 +81,23 @@ class Bot(Player):
         elif cur_round == 4 and self.diamonds < (highest_diamonds - 20):
             self.level = 3
 
-
-
-
-    # Bot level 1
-    def bot_lvl1(self, diamonds_on_way, relics_on_way, probability, e_go_home_now):
-        if self.level == 1:
-            if probability > 0.1 and (diamonds_on_way + relics_on_way + self.pocket) != 0:
-                self.bot_goes_home(e_go_home_now)
-            else:
-                self.bot_stays_inside()
-
-    # Bot level 2
-    def bot_lvl2(self, diamonds_on_way, relics_on_way, probability, e_go_home_now):
-        if self.level == 2:
-            if probability > 0.17 and (diamonds_on_way + relics_on_way + self.pocket) != 0:
-                self.bot_goes_home(e_go_home_now)
-            else:
-                self.bot_stays_inside()
-
-    # Bot level 3
-    def bot_lvl3(self, diamonds_on_way, relics_on_way, probability, e_go_home_now):
-        if self.level == 3:
-            if probability > 0.25 and (diamonds_on_way + relics_on_way + self.pocket) != 0:
-                self.bot_goes_home(e_go_home_now)
-            else:
-                self.bot_stays_inside()
-
-    # Bot level last round
-    def bot_lvl_last(self, highest_diamonds):
+    # Bot takes action, depending on Level
+    def act_based_on_level(self, diamonds_on_way, relics_on_way, probability, e_go_home_now, highest_diamonds):
         if self.level == 10:
-            if (highest_diamonds - 20) <= self.diamonds < highest_diamonds:
-                self.bot_stays_inside()
-            elif self.diamonds == highest_diamonds:
-                self.level = 2
-            elif self.diamonds < (highest_diamonds - 20):
-                self.level = 3
+            level_last_round = Level_Last_Round(self, diamonds_on_way, relics_on_way, probability, e_go_home_now, highest_diamonds)
+            level_last_round.action()
+        if self.level == 1:
+            level_1 = Level_1(self, diamonds_on_way, relics_on_way, probability, e_go_home_now, highest_diamonds)
+            level_1.action()
+        elif self.level == 2:
+            level_2 = Level_2(self, diamonds_on_way, relics_on_way, probability, e_go_home_now, highest_diamonds)
+            level_2.action()
+        elif self.level == 3:
+            level_3 = Level_3(self, diamonds_on_way, relics_on_way, probability, e_go_home_now, highest_diamonds)
+            level_3.action()
 
     # Ask bot what he wants to do
     def ask_bot(self, diamonds_on_way, players_inside, cur_round, highest_diamonds, relics_on_way, probability, e_go_home_now):
         self.tell_b_diamonds(diamonds_on_way)
         self.last_round_risk(diamonds_on_way, players_inside, cur_round, highest_diamonds)
-        self.bot_lvl_last(highest_diamonds)
-        self.bot_lvl1(diamonds_on_way, relics_on_way, probability, e_go_home_now)
-        self.bot_lvl2(diamonds_on_way, relics_on_way, probability, e_go_home_now)
-        self.bot_lvl3(diamonds_on_way, relics_on_way, probability, e_go_home_now)
+        self.act_based_on_level(diamonds_on_way, relics_on_way, probability, e_go_home_now, highest_diamonds)
