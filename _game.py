@@ -1,6 +1,7 @@
 # Classes Player and Bot
 from _player import Player, Bot
 from _cards import Cards
+from NewCardEvent import DrawCard
 
 # Game
 class Game:
@@ -116,30 +117,6 @@ class Game:
         else:
             return False
 
-    # Check whether it is the second trap
-    def check_second_trap(self):
-        if self.cards.new_card in self.cards.traps and self.cards.new_card in self.cards.played_cards:
-            return True
-        else:
-            return False
-
-    # Second trap
-    def sec_trap(self):
-        if self.check_second_trap():
-            print()
-            print(f"Oh no! It's the second {self.cards.new_card}")
-            print("All the players inside lose their diamonds!")
-            if self.rounds == 5 - 1:
-                print()
-                print("_____________________________________________________________")
-            self.cards.full_deck.remove(self.cards.new_card)
-            for p in self.players_inside:
-                p.die()
-            self.p_inside = False
-            return True
-        else:
-            return False
-
     # Calculate probability of dying on the next move
     def calc_prob(self):
         killing_traps = 0
@@ -154,11 +131,6 @@ class Game:
         return probability
 
     # Tell situation
-    def tell_new_card(self):
-        print()
-        print(f"The drawn card was a {self.cards.new_card}")
-        print()
-
     def tell_probability(self):
         return f"The probability of dying in the next move is {self.calc_prob()*100:.1f}%"
 
@@ -174,63 +146,15 @@ class Game:
             if self.amount_current_winner <= c_diamonds:
                 self.amount_current_winner = c_diamonds
 
-    # First trap
-    def new_in_traps(self):
-        if self.cards.new_card in self.cards.traps:
-            print("_____________________________________________________________")
-            print()
-            print(self.tell_probability())
-            print()
-            self.tell_relics_on_way()
-
-    # Put remainder of treasure card on the way
-    def add_treasure_card_remainder_to_way(self):
-        if self.cards.new_card in self.cards.treasure_cards:
-            self.diamonds_on_way += self.cards.new_card % len(self.players_inside)
-
-    # Put share of treasure card in pocket
-    def new_in_treasure_cards(self, i):
-        if self.cards.new_card in self.cards.treasure_cards:
-            print("_____________________________________________________________")
-            self.players_inside[i].pocket += self.cards.new_card // len(self.players_inside)
-            print()
-            print(self.tell_probability())
-            print()
-            self.tell_relics_on_way()
-
-    # Put relics on the way
-    def add_relics_to_relics_on_way(self):
-        if self.cards.new_card in self.cards.relics:
-            self.relics_on_way += int(self.cards.new_card)
-            self.cards.full_deck.remove(self.cards.new_card)
-
-    # Tell the amount of relics on the way
-    def new_in_relics(self):
-        if self.cards.new_card in self.cards.relics:
-            print("_____________________________________________________________")
-            print()
-            print(self.tell_probability())
-            print()
-            self.tell_relics_on_way()
-
     # Ask the player / bot what he wants to do
-    def ask_explorer(self, i):
-        if not self.players_inside[i].is_bot:
-            self.players_inside[i].ask_player(self.diamonds_on_way, self.go_home_now)
-        elif len(self.bots) != 0 and self.players_inside[i].is_bot:
-            self.players_inside[i].ask_bot(self.diamonds_on_way, self.players_inside, self.rounds, self.amount_current_winner,
-                                           self.relics_on_way, self.calc_prob(), self.go_home_now)
+    def ask_explorer(self, p):
+        self.tell_relics_on_way()
+        if not p.is_bot:
+            p.ask_player(self.diamonds_on_way, self.go_home_now)
+        elif len(self.bots) != 0 and p.is_bot:
+            p.ask_bot(self.diamonds_on_way, self.players_inside, self.rounds, self.amount_current_winner,
+                      self.relics_on_way, self.calc_prob(), self.go_home_now)
 
-    # Take action based on the drawn card
-    def act_on_card(self):
-        self.add_treasure_card_remainder_to_way()
-        self.add_relics_to_relics_on_way()
-        self.identify_highest_diamonds()
-        for i in range(len(self.players_inside)):
-            self.new_in_traps()
-            self.new_in_treasure_cards(i)
-            self.new_in_relics()
-            self.ask_explorer(i)
 
     # Put share of diamonds on the way into the home going player's chests
     def split_diamonds_on_way(self):
@@ -253,24 +177,11 @@ class Game:
             print(played_card, end=" ")
         print()
 
-    # Card is not the second trap
-    def not_sec_traps(self):
-        if not self.check_second_trap():
-            self.tell_new_card()
-            self.act_on_card()
-            self.split_diamonds_on_way()
-            self.earn_relics()
-            self.go_home_now.clear()
-            self.players_inside = [p for p in self.explorers if p.inside]
-            self.cards.played_cards.append(self.cards.new_card)
-            self.tell_played_cards()
-
     # Still players inside
     def still_players_inside(self):
         if not self.no_players_inside():
-            self.cards.draw_card()
-            self.sec_trap()
-            self.not_sec_traps()
+            drawcard = DrawCard(self)
+            drawcard.draw_card()
 
     def identify_final_winner(self):
         for s in self.explorers:
