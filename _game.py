@@ -47,9 +47,9 @@ class Game:
         players_amount = int(players_amount)
         for player_num in range(players_amount):
             player_name = input(f"Enter player number {player_num + 1}'s name: ").capitalize()
-            self.players.append(player_name)
+            self.players.append(Player(player_name))
             print("________________________________________")
-        self.players = [Player(self.players[i]) for i in range(len(self.players))]
+
 
     # Create bots
     def create_bots(self):
@@ -61,16 +61,18 @@ class Game:
         print("________________________________________")
         bots_amount = int(bots_amount)
         if bots_amount != 0:
-            for l in range(bots_amount):
-                level_bot = input(f"Select a level for Bot {l + 1} (careful: 1 / medium: 2 / risky: 3): ")
+            for bots_num in range(bots_amount):
+                level_bot = input(f"Select a level for Bot {bots_num + 1} (careful: 1 / medium: 2 / risky: 3): ")
                 while not level_bot == "1" and not level_bot == "2" and not level_bot == "3":
                     level_bot = input(
-                        f"{level_bot} is not valid. Select a level for Bot {l + 1} (careful: 1 / medium: 2 / risky: 3): ")
+                        f"{level_bot} is not valid. Select a level for Bot {bots_num + 1} (careful: 1 / medium: 2 / risky: 3): ")
                 level_bot = int(level_bot)
-                self.level_bots.append(level_bot)
-            for bots_num in range(bots_amount):
-                self.bots.append(f"Bot {bots_num + 1}")
-            self.bots = [Bot(self.bots[i], self.level_bots[i]) for i in range(len(self.bots))]
+                if level_bot == 1:
+                    self.bots.append(Bot(f"Bot {bots_num + 1}", level_bot))
+                elif level_bot == 2:
+                    self.bots.append(Bot(f"Bot {bots_num + 1}", level_bot))
+                elif level_bot == 3:
+                    self.bots.append(Bot(f"Bot {bots_num + 1}", level_bot))
 
     # Create explorers
     def create_explorers(self):
@@ -304,7 +306,7 @@ class Game:
         print("*************************************************************")
         print()
 
-    # Reset the cards
+    # Reset the game
     def reset_game(self):
         self.cards.traps = self.cards.snakes + self.cards.spiders + self.cards.fires + self.cards.avalanches + self.cards.mummies
         self.cards.full_deck = self.cards.traps + self.cards.treasure_cards
