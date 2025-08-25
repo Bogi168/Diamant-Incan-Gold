@@ -1,7 +1,8 @@
 # Classes Player and Bot
 from _player import Player, Bot
 from _cards import Cards
-from NewCardEvent import DrawCard
+from NewCardEvent import Draw_Card
+from LevelStrategy import Act_On_Card
 
 # Game
 class Game:
@@ -48,7 +49,7 @@ class Game:
         players_amount = int(players_amount)
         for player_num in range(players_amount):
             player_name = input(f"Enter player number {player_num + 1}'s name: ").capitalize()
-            self.players.append(Player(player_name))
+            self.players.append(Player(player_name=player_name, game_object=self))
             print("________________________________________")
 
 
@@ -69,11 +70,11 @@ class Game:
                         f"{level_bot} is not valid. Select a level for Bot {bots_num + 1} (careful: 1 / medium: 2 / risky: 3): ")
                 level_bot = int(level_bot)
                 if level_bot == 1:
-                    self.bots.append(Bot(f"Bot {bots_num + 1}", level_bot))
+                    self.bots.append(Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
                 elif level_bot == 2:
-                    self.bots.append(Bot(f"Bot {bots_num + 1}", level_bot))
+                    self.bots.append(Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
                 elif level_bot == 3:
-                    self.bots.append(Bot(f"Bot {bots_num + 1}", level_bot))
+                    self.bots.append(Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
 
     # Create explorers
     def create_explorers(self):
@@ -128,6 +129,7 @@ class Game:
                 killing_traps += traps_in_game
         probability += killing_traps / len(self.cards.deck)
         self.cards.played_cards.pop(-1)
+        self.probability = probability
         return probability
 
     # Tell situation
@@ -150,10 +152,10 @@ class Game:
     def ask_explorer(self, p):
         self.tell_relics_on_way()
         if not p.is_bot:
-            p.ask_player(self.diamonds_on_way, self.go_home_now)
+            p.ask_player()
         elif len(self.bots) != 0 and p.is_bot:
-            p.ask_bot(self.diamonds_on_way, self.players_inside, self.rounds, self.amount_current_winner,
-                      self.relics_on_way, self.calc_prob(), self.go_home_now)
+            act_on_card = Act_On_Card(self, p)
+            act_on_card.ask_bot()
 
 
     # Put share of diamonds on the way into the home going player's chests
@@ -180,7 +182,7 @@ class Game:
     # Still players inside
     def still_players_inside(self):
         if not self.no_players_inside():
-            drawcard = DrawCard(self)
+            drawcard = Draw_Card(self)
             drawcard.draw_card()
 
     def identify_final_winner(self):
