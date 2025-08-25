@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class New_Card_Event(ABC):
+class New_Card(ABC):
     def __init__(self, game_object):
         self.game_object = game_object
 
@@ -8,7 +8,7 @@ class New_Card_Event(ABC):
     def act_on_card(self):
         pass
 
-class Second_Trap(New_Card_Event):
+class Second_Trap(New_Card):
     def act_on_card(self):
         print()
         print(f"Oh no! It's the second {self.game_object.cards.new_card}")
@@ -21,7 +21,7 @@ class Second_Trap(New_Card_Event):
             p.die()
         self.game_object.p_inside = False
 
-class First_Trap(New_Card_Event):
+class First_Trap(New_Card):
     def act_on_card(self):
         self.game_object.identify_highest_diamonds()
         for p in self.game_object.players_inside:
@@ -31,7 +31,7 @@ class First_Trap(New_Card_Event):
             print()
             self.game_object.ask_explorer(p)
 
-class Treasure_Card(New_Card_Event):
+class Treasure_Card(New_Card):
     def act_on_card(self):
         self.game_object.diamonds_on_way += self.game_object.cards.new_card % len(self.game_object.players_inside)
         self.game_object.identify_highest_diamonds()
@@ -44,7 +44,7 @@ class Treasure_Card(New_Card_Event):
             self.game_object.ask_explorer(p)
 
 
-class Relics(New_Card_Event):
+class Relics(New_Card):
     def act_on_card(self):
         self.game_object.relics_on_way += int(self.game_object.cards.new_card)
         self.game_object.cards.full_deck.remove(self.game_object.cards.new_card)
@@ -56,7 +56,7 @@ class Relics(New_Card_Event):
             print()
             self.game_object.ask_explorer(p)
 
-class DrawCard:
+class Draw_Card:
     def __init__(self, game_object):
         self.game_object = game_object
 
