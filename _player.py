@@ -15,7 +15,6 @@ class Player:
         self.pocket = 0
         self.game_object.go_home_now.append(self)
         self.inside = False
-        return self.game_object.go_home_now
 
     # Player dies
     def die(self):
@@ -31,11 +30,11 @@ class Player:
     # Ask player what he wants to do
     def ask_player(self):
         self.tell_p_diamonds()
-        question = input(f"{self.player_name}: Do you want to go home? (Y/N) ").upper()
-        while not question.isalpha():
-            question = input(f"{self.player_name}: {question} is not valid. Do you want to go home? (Y/N) ").upper()
+        decision = input(f"{self.player_name}: Do you want to go home? (Y/N) ").upper()
+        while not decision.isalpha():
+            decision = input(f"{self.player_name}: {decision} is not valid. Do you want to go home? (Y/N) ").upper()
         print("_____________________________________________________________")
-        if question == "Y":
+        if decision == "Y" or decision == "YES":
             self.go_home()
 
 # Class Bot
