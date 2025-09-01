@@ -1,10 +1,10 @@
 # Classes Player and Bot
-from _player import Player, Bot
-from _cards import Cards
-from NewCardEvent import Draw_Card
-from LevelStrategy import Act_On_Card
+from Main_Game._player import Player, Bot
+from Main_Game._cards import Cards
+from Main_Game.NewCardEvent import Draw_Card
+from Main_Game.LevelStrategy import Act_On_Card
 
-# Game
+# Main_Game
 class Game:
     def __init__(self):
         # Define explorer lists
@@ -16,7 +16,7 @@ class Game:
         self.go_home_now = []
         self.final_winners = []
 
-        # Define Game variables
+        # Define Main_Game variables
         self.is_running = True
         self.rounds = 0
         self.p_inside = True
@@ -27,7 +27,7 @@ class Game:
 
 
         # Create cards object
-        self.cards = Cards()
+        self.cards = Cards(self)
 
 
     # Welcome text
@@ -102,7 +102,7 @@ class Game:
         self.diamonds_on_way = 0
         self.relics_on_way = 0
         self.cards.reset_played_cards()
-        self.cards.add_relics(self.rounds)
+        self.cards.add_relics()
 
     # Start Round
     def start_round(self):
@@ -185,7 +185,7 @@ class Game:
             drawcard = Draw_Card(self)
             drawcard.draw_card()
 
-    def identify_final_winner(self):
+    def identify_game_winner(self):
         for s in self.explorers:
             if self.amount_final_winner < s.chest:
                 self.amount_final_winner = s.chest
@@ -195,11 +195,12 @@ class Game:
                 self.final_winners.append(s)
 
 
+
     # Present the result
     def tell_result(self):
         print()
         print("_____________________________________________________________")
-        self.identify_final_winner()
+        self.identify_game_winner()
         for e in self.explorers:
             print(f"{e.player_name} collected {e.chest} Diamonds")
         print("_____________________________________________________________")
@@ -234,7 +235,7 @@ class Game:
     # Ask about playing again
     def ask_again(self):
         play_again = input("Do you want to play again? (Y/N) ").upper()
-        if play_again == "Y":
+        if play_again == "Y" or play_again == "YES":
             self.reset_game()
         else:
             print()
