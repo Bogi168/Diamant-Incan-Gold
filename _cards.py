@@ -1,7 +1,8 @@
 import random
 
 class Cards:
-    def __init__(self):
+    def __init__(self, game_object):
+        self.game_object = game_object
         # Define cards
         self.snakes = ["🐍"] * 3
         self.spiders = ["🕷"] * 3
@@ -30,7 +31,7 @@ class Cards:
         self.deck.remove(self.new_card)
 
     # Add relics
-    def add_relics(self, round_num):
-        relic = self.p_relics[round_num]
+    def add_relics(self):
+        relic = self.p_relics[self.game_object.rounds]
         self.full_deck.append(relic)
         self.deck = self.full_deck.copy()
