@@ -4,30 +4,52 @@ class LevelStrategy(ABC):
     def __init__(self, current_bot, game_object):
         self.current_bot = current_bot
         self.game_object = game_object
+        self.amount_available_diamonds = self.game_object.diamonds_on_way + self.game_object.relics_on_way + self.current_bot.pocket
 
     @abstractmethod
     def action(self):
         pass
 
+    def bool_diamonds_available(self):
+        if self.amount_available_diamonds != 0:
+            return True
+        else:
+            return False
+
 
 class Level_1(LevelStrategy):
     def action(self):
-        if self.game_object.probability > 0.1 and (self.game_object.diamonds_on_way + self.game_object.relics_on_way + self.current_bot.pocket) != 0:
+#        if self.game_object.probability > 0.1 and self.bool_diamonds_available():
+#            self.current_bot.bot_goes_home()
+#        else:
+#            self.current_bot.bot_stays_inside()
+        if (self.game_object.calc_ev_next(self.current_bot) - self.current_bot.pocket) < 0 and self.bool_diamonds_available():
             self.current_bot.bot_goes_home()
         else:
             self.current_bot.bot_stays_inside()
 
 class Level_2(LevelStrategy):
     def action(self):
-        if self.game_object.probability > 0.17 and (self.game_object.diamonds_on_way + self.game_object.relics_on_way + self.current_bot.pocket) != 0:
+        if self.game_object.probability > 0.17 and self.bool_diamonds_available():
             self.current_bot.bot_goes_home()
         else:
             self.current_bot.bot_stays_inside()
 
 class Level_3(LevelStrategy):
     def action(self):
-        if self.game_object.probability > 0.25 and (self.game_object.diamonds_on_way + self.game_object.relics_on_way + self.current_bot.pocket) != 0:
+        if self.game_object.probability > 0.25 and self.bool_diamonds_available():
                 self.current_bot.bot_goes_home()
+        else:
+                self.current_bot.bot_stays_inside()
+
+class Level_4(LevelStrategy):
+    def action(self):
+        if self.game_object.probability > 0.20 and self.bool_diamonds_available():
+                self.current_bot.bot_goes_home()
+
+        elif self.amount_available_diamonds / len(self.game_object.players_inside) > 10 :
+            self.current_bot.bot_goes_home()
+
         else:
                 self.current_bot.bot_stays_inside()
 
@@ -79,3 +101,6 @@ class Act_On_Card:
         elif self.current_bot.level == 3:
             level_3 = Level_3(self.current_bot, self.game_object)
             level_3.action()
+        elif self.current_bot.level == 4:
+            level_4 = Level_4(self.current_bot, self.game_object)
+            level_4.action()
