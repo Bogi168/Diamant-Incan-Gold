@@ -153,6 +153,14 @@ class Game:
         ev_next = surviving_prob * future_diamonds - dying_prob * (player.pocket) #+ self.diamonds_on_way // len(self.players_inside))
         return ev_next
 
+    def calc_ev_next_dia_on_way(self, player):
+        dying_prob = self.calc_prob()
+        surviving_prob = (1 - dying_prob)
+        future_diamonds = (self.calc_undiscovered_diamonds() / (len(self.cards.deck) * len(self.players_inside))
+                           + player.pocket + self.diamonds_on_way // len(self.players_inside))
+        ev_next = surviving_prob * future_diamonds - dying_prob * (player.pocket + self.diamonds_on_way // len(self.players_inside))
+        return ev_next
+
     # Tell situation
     def tell_probability(self):
         return f"The probability of dying in the next move is {self.calc_prob()*100:.1f}%"
