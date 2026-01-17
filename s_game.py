@@ -110,7 +110,7 @@ class s_Game(Game):
             print("******************************************************************")
             print(f"{e.bot_name} (Level: {e.level}) won {e.round_winning_count} rounds")
             print(f"{e.bot_name} won {e.game_winning_count} games")
-            print(f"That's a win rate of {e.game_winning_count / self.games_amount * 100}%")
+            print(f"That's a win rate of {e.game_winning_count / self.games_amount * 100:.1f}%")
             print(f"{e.bot_name} collected {e.diamond_count} diamonds")
             print(f"That's {((e.diamond_count/5)/self.games_amount):.1f} diamonds per round")
             print(f"{e.bot_name} collected {e.max_diamonds} diamonds in his best round")
