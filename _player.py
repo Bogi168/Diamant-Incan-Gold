@@ -25,6 +25,7 @@ class Player:
     def tell_p_diamonds(self):
         print(f"You have {self.pocket} diamond(s) in your pocket")
         print(f"There is/are {self.game_object.diamonds_on_way} diamond(s) on the way home")
+        print(f"The expected value is {self.game_object.calc_ev_next(self):.2f}")
         print("_____________________________________________________________")
 
     # Ask player what he wants to do
