@@ -22,6 +22,9 @@ class Game:
         self.p_inside = True
         self.diamonds_on_way = 0
         self.relics_on_way = 0
+        self.undiscovered_diamonds = 0
+        self.dying_prob = 0
+        self.surviving_prob = 0
         self.amount_current_winner = 0
         self.amount_final_winner = 0
 
@@ -69,14 +72,7 @@ class Game:
                     level_bot = input(
                         f"{level_bot} is not valid. Select a level for Bot {bots_num + 1} (careful: 1 / medium: 2 / risky: 3): ")
                 level_bot = int(level_bot)
-                if level_bot == 1:
-                    self.bots.append(Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
-                elif level_bot == 2:
-                    self.bots.append(Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
-                elif level_bot == 3:
-                    self.bots.append(Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
-                elif level_bot == 4:
-                    self.bots.append(Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
+                self.bots.append(Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
 
     # Create explorers
     def create_explorers(self):
@@ -100,7 +96,7 @@ class Game:
         self.players_inside.clear()
         for p in self.explorers:
             p.inside = True
-        self.players_inside = [p for p in self.explorers if p.inside]
+        self.players_inside = [p for p in self.explorers]
         self.diamonds_on_way = 0
         self.relics_on_way = 0
         self.cards.reset_played_cards()
@@ -121,7 +117,7 @@ class Game:
             return False
 
     # Calculate probability of dying on the next move
-    def calc_prob(self):
+    def calc_dying_prob(self):
         killing_traps = 0
         probability = 0
         self.cards.played_cards.append(self.cards.new_card)
@@ -131,42 +127,44 @@ class Game:
                 killing_traps += traps_in_game
         probability += killing_traps / len(self.cards.deck)
         self.cards.played_cards.pop(-1)
-        self.probability = probability
+        self.dying_prob = probability
         return probability
 
     # Calculate amount of undiscovered diamonds
     def calc_undiscovered_diamonds(self):
-        undiscovered_diamonds = 0
+        self.undiscovered_diamonds = 0
         self.cards.played_cards.append(self.cards.new_card)
         for card in self.cards.deck:
             if card in self.cards.treasure_cards:
-                undiscovered_diamonds += card
+                self.undiscovered_diamonds += card
         self.cards.played_cards.pop(-1)
-        self.undiscovered_diamonds = undiscovered_diamonds
-        return undiscovered_diamonds
+
+    def calc_guaranteed_diamonds(self, player):
+        player.guaranteed_diamonds = player.pocket + self.diamonds_on_way // len(self.players_inside)
+        if len(self.players_inside) == 1:
+            player.guaranteed_diamonds += self.relics_on_way
 
     def calc_ev_next(self, player):
-        dying_prob = self.calc_prob()
-        surviving_prob = (1 - dying_prob)
-        future_diamonds = (self.calc_undiscovered_diamonds() / (len(self.cards.deck) * len(self.players_inside))
+        self.calc_dying_prob()
+        self.surviving_prob = (1 - self.dying_prob)
+        self.calc_undiscovered_diamonds()
+        future_diamonds = (self.undiscovered_diamonds / (len(self.cards.deck) * len(self.players_inside))
                            + player.pocket) #+ self.diamonds_on_way // len(self.players_inside))
-        ev_next = surviving_prob * future_diamonds - dying_prob * (player.pocket) #+ self.diamonds_on_way // len(self.players_inside))
+        ev_next = self.surviving_prob * future_diamonds - self.dying_prob * (player.pocket) #+ self.diamonds_on_way // len(self.players_inside))
         return ev_next
 
     def calc_ev_next_dia_on_way(self, player):
-        dying_prob = self.calc_prob()
-        surviving_prob = (1 - dying_prob)
-        future_diamonds = (self.calc_undiscovered_diamonds() / (len(self.cards.deck) * len(self.players_inside))
-                           + player.pocket + self.diamonds_on_way // len(self.players_inside))
-        ev_next = surviving_prob * future_diamonds - dying_prob * (player.pocket + self.diamonds_on_way // len(self.players_inside))
+        self.calc_dying_prob()
+        self.surviving_prob = (1 - self.dying_prob)
+        self.calc_undiscovered_diamonds()
+        self.calc_guaranteed_diamonds(player)
+        future_diamonds = self.undiscovered_diamonds / (len(self.cards.deck) * len(self.players_inside)) + player.guaranteed_diamonds
+        ev_next = self.surviving_prob * future_diamonds - self.dying_prob * player.guaranteed_diamonds
         return ev_next
 
     # Tell situation
     def tell_probability(self):
-        return f"The probability of dying in the next move is {self.calc_prob()*100:.1f}%"
-
-    def tell_undiscovered_diamonds(self):
-        return f"There are {self.calc_undiscovered_diamonds()} undiscovered diamonds remaining"
+        return f"The probability of dying in the next move is {self.dying_prob * 100:.1f}%"
 
     def tell_relics_on_way(self):
         if self.relics_on_way != 0:
