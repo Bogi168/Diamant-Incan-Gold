@@ -19,32 +19,39 @@ class LevelStrategy(ABC):
 
 class Level_1(LevelStrategy):
     def action(self):
-#        if self.game_object.probability > 0.1 and self.bool_diamonds_available():
+#        if self.game_object.dying_prob > 0.1 and self.bool_diamonds_available():
 #            self.current_bot.bot_goes_home()
 #        else:
 #            self.current_bot.bot_stays_inside()
-        if (self.game_object.calc_ev_next(self.current_bot) - self.current_bot.pocket) < 0 and self.bool_diamonds_available():
+
+        if ((self.game_object.calc_ev_next_dia_on_way(self.current_bot) - self.current_bot.pocket - (self.game_object.diamonds_on_way // len(self.game_object.players_inside))) < 0
+                and self.bool_diamonds_available()):
             self.current_bot.bot_goes_home()
+
         else:
             self.current_bot.bot_stays_inside()
 
 class Level_2(LevelStrategy):
     def action(self):
-        if self.game_object.probability > 0.17 and self.bool_diamonds_available():
+        if self.game_object.dying_prob > 0.17 and self.bool_diamonds_available():
             self.current_bot.bot_goes_home()
+
+#        if (self.game_object.calc_ev_next(self.current_bot) - self.current_bot.pocket) < 0 and self.bool_diamonds_available():
+#            self.current_bot.bot_goes_home()
+
         else:
             self.current_bot.bot_stays_inside()
 
 class Level_3(LevelStrategy):
     def action(self):
-        if self.game_object.probability > 0.25 and self.bool_diamonds_available():
+        if self.game_object.dying_prob > 0.25 and self.bool_diamonds_available():
                 self.current_bot.bot_goes_home()
         else:
                 self.current_bot.bot_stays_inside()
 
 class Level_4(LevelStrategy):
     def action(self):
-        if self.game_object.probability > 0.20 and self.bool_diamonds_available():
+        if self.game_object.dying_prob > 0.20 and self.bool_diamonds_available():
                 self.current_bot.bot_goes_home()
 
         elif self.amount_available_diamonds / len(self.game_object.players_inside) > 10 :
