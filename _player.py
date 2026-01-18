@@ -7,6 +7,7 @@ class Player:
         self.inside = True
         self.pocket = 0
         self.chest = 0
+        self.guaranteed_diamonds = 0
         self.is_bot = is_bot
 
     # Player goes home
