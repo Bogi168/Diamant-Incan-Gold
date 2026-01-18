@@ -74,6 +74,7 @@ class Draw_Card:
 
     def draw_card(self):
         self.game_object.cards.draw_card()
+        self.game_object.calc_dying_prob()
         if self.check_second_trap():
             drawn_card = Second_Trap(self.game_object)
             drawn_card.act_on_card()
