@@ -32,6 +32,7 @@ class s_Relics(Relics):
 class s_Draw_Card(Draw_Card):
     def draw_card(self):
         self.game_object.cards.draw_card()
+        self.game_object.calc_dying_prob()
         if self.check_second_trap():
             drawn_card = s_Second_Trap(self.game_object)
             drawn_card.act_on_card()
