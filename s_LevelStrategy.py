@@ -2,12 +2,16 @@ from Main_Game.LevelStrategy import *
 
 class s_Level_1(Level_1):
     def action(self):
-#        if self.game_object.calc_prob() > 0.08 and self.bool_diamonds_available():
+#        if self.game_object.dying_prob > 0.08 and self.bool_diamonds_available():
 #            self.current_bot.bot_goes_home()
 
-        if ((self.game_object.calc_ev_next_dia_on_way(self.current_bot) - self.current_bot.pocket - (self.game_object.diamonds_on_way // len(self.game_object.players_inside))) < 0
+        if ((self.game_object.calc_ev_next_dia_on_way(self.current_bot) - self.current_bot.guaranteed_diamonds) < 0
                 and self.bool_diamonds_available()):
             self.current_bot.bot_goes_home()
+
+
+#        if (self.game_object.calc_ev_next(self.current_bot) - self.current_bot.pocket) < 0 and self.bool_diamonds_available():
+#            self.current_bot.bot_goes_home()
 
 #        elif self.game_object.calc_undiscovered_diamonds() < 50:
 #            self.current_bot.bot_goes_home()
@@ -18,11 +22,11 @@ class s_Level_1(Level_1):
 
 class s_Level_2(Level_2):
     def action(self):
-#        if self.game_object.calc_prob() > 0.17 and self.bool_diamonds_available():
-#            self.current_bot.bot_goes_home()
-
-        if (self.game_object.calc_ev_next(self.current_bot) - self.current_bot.pocket) < 0 and self.bool_diamonds_available():
+        if self.game_object.dying_prob > 0.17 and self.bool_diamonds_available():
             self.current_bot.bot_goes_home()
+
+#        if (self.game_object.calc_ev_next(self.current_bot) - self.current_bot.pocket) < 0 and self.bool_diamonds_available():
+#            self.current_bot.bot_goes_home()
 
 #        elif self.game_object.calc_undiscovered_diamonds() < 70:
 #            self.current_bot.bot_goes_home()
@@ -33,7 +37,7 @@ class s_Level_2(Level_2):
 
 class s_Level_3(Level_3):
     def action(self):
-        if self.game_object.calc_prob() > 0.25 and self.bool_diamonds_available():
+        if self.game_object.dying_prob > 0.25 and self.bool_diamonds_available():
                 self.current_bot.bot_goes_home()
 
 #        if (self.game_object.calc_ev_next(self.current_bot) - self.current_bot.pocket) < 0 and self.bool_diamonds_available():
