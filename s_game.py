@@ -1,4 +1,5 @@
-from Main_Game._game import Game
+from Main_Game.m_game import Game
+from Simulation.s_console import s_Console
 from s_player import s_Bot
 from s_NewCardEvent import s_Draw_Card
 from s_LevelStrategy import s_Act_On_Card
@@ -9,22 +10,11 @@ class s_Game(Game):
         super().__init__()
         self.bots_amount = 0
         self.games_amount = 0
-
-    def select_bots_amount(self):
-        self.bots_amount = input("How many bots? ")
-        while not self.bots_amount.isdigit() or int(self.bots_amount) <= 0:
-            self.bots_amount = input("That's not a valid number. How many bots? ")
-        self.bots_amount = int(self.bots_amount)
-
-    def select_games_amount(self):
-        self.games_amount = input("How many games? ")
-        while not self.games_amount.isdigit() or int(self.games_amount) <= 0:
-            self.games_amount = input("That's not a valid number. How many games?: ")
-        self.games_amount = int(self.games_amount)
+        self.console = s_Console(self)
 
     def create_explorers(self):
-        self.select_bots_amount()
-        self.select_games_amount()
+        self.console.select_bots_amount()
+        self.console.select_games_amount()
         level_bot = 1
         for bots_num in range(self.bots_amount):
             if level_bot==4:
@@ -42,9 +32,9 @@ class s_Game(Game):
         self.reset_round()
         self.p_inside = True
 
-    def ask_explorer(self, p):
+    def ask_explorer(self, player):
         if len(self.explorers) != 0:
-            act_on_card = s_Act_On_Card(self, p)
+            act_on_card = s_Act_On_Card(self, player)
             act_on_card.ask_bot()
 
     def still_players_inside(self):
@@ -103,23 +93,9 @@ class s_Game(Game):
             b.pocket = 0
             b.chest = 0
 
-    def tell_stats(self):
-        self.get_max_diamonds()
-        for e in self.explorers:
-            print()
-            print("******************************************************************")
-            print(f"{e.bot_name} (Level: {e.level}) won {e.round_winning_count} rounds")
-            print(f"{e.bot_name} won {e.game_winning_count} games")
-            print(f"That's a win rate of {e.game_winning_count / self.games_amount * 100:.1f}%")
-            print(f"{e.bot_name} collected {e.diamond_count} diamonds")
-            print(f"That's {((e.diamond_count/5)/self.games_amount):.1f} diamonds per round")
-            print(f"{e.bot_name} collected {e.max_diamonds} diamonds in his best round")
-            print("******************************************************************")
-            print()
-
     def main(self):
         self.create_explorers()
         for game_num in range(self.games_amount):
             self.play_rounds()
             self.reset_game()
-        self.tell_stats()
+        self.console.tell_stats()
