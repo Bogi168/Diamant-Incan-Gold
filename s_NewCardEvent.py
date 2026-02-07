@@ -1,33 +1,33 @@
-from Main_Game.NewCardEvent import *
+from Main_Game.m_NewCardEvent import *
 
 class s_Second_Trap(Second_Trap):
     def act_on_card(self):
         self.game_object.cards.full_deck.remove(self.game_object.cards.new_card)
-        for p in self.game_object.players_inside:
-            p.die()
+        for player in self.game_object.players_inside:
+            player.die()
         self.game_object.p_inside = False
 
 class s_First_Trap(First_Trap):
     def act_on_card(self):
         self.game_object.identify_highest_diamonds()
-        for p in self.game_object.players_inside:
-            self.game_object.ask_explorer(p)
+        for player in self.game_object.players_inside:
+            self.game_object.ask_explorer(player)
 
 class s_Treasure_Card(Treasure_Card):
     def act_on_card(self):
         self.game_object.diamonds_on_way += self.game_object.cards.new_card % len(self.game_object.players_inside)
         self.game_object.identify_highest_diamonds()
-        for p in self.game_object.players_inside:
-            p.pocket += self.game_object.cards.new_card // len(self.game_object.players_inside)
-            self.game_object.ask_explorer(p)
+        for player in self.game_object.players_inside:
+            player.pocket += self.game_object.cards.new_card // len(self.game_object.players_inside)
+            self.game_object.ask_explorer(player)
 
 class s_Relics(Relics):
     def act_on_card(self):
         self.game_object.relics_on_way += int(self.game_object.cards.new_card)
         self.game_object.cards.full_deck.remove(self.game_object.cards.new_card)
         self.game_object.identify_highest_diamonds()
-        for p in self.game_object.players_inside:
-            self.game_object.ask_explorer(p)
+        for player in self.game_object.players_inside:
+            self.game_object.ask_explorer(player)
 
 class s_Draw_Card(Draw_Card):
     def draw_card(self):
