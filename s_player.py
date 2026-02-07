@@ -1,4 +1,4 @@
-from Main_Game._player import Bot
+from Main_Game.m_player import Bot
 
 class s_Bot(Bot):
     def __init__(self, bot_name, level, game_object):
@@ -8,6 +8,3 @@ class s_Bot(Bot):
         self.diamond_count = 0
         self.collected_diamonds = []
         self.max_diamonds = 0
-
-    def bot_goes_home(self):
-        self.go_home()
