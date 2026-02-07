@@ -10,38 +10,27 @@ class New_Card(ABC):
 
 class Second_Trap(New_Card):
     def act_on_card(self):
-        print()
-        print(f"Oh no! It's the second {self.game_object.cards.new_card}")
-        print("All the players inside lose their diamonds!")
-        if self.game_object.rounds == 5 - 1:
-            print()
-            print("_____________________________________________________________")
+        self.game_object.console.second_trap()
         self.game_object.cards.full_deck.remove(self.game_object.cards.new_card)
-        for p in self.game_object.players_inside:
-            p.die()
+        for player in self.game_object.players_inside:
+            player.die()
         self.game_object.p_inside = False
 
 class First_Trap(New_Card):
     def act_on_card(self):
         self.game_object.identify_highest_diamonds()
-        for p in self.game_object.players_inside:
-            print("_____________________________________________________________")
-            print()
-            print(self.game_object.tell_probability())
-            print()
-            self.game_object.ask_explorer(p)
+        for player in self.game_object.players_inside:
+            self.game_object.console.first_trap_or_treasure_card_or_relics()
+            self.game_object.ask_explorer(player)
 
 class Treasure_Card(New_Card):
     def act_on_card(self):
         self.game_object.diamonds_on_way += self.game_object.cards.new_card % len(self.game_object.players_inside)
         self.game_object.identify_highest_diamonds()
-        for p in self.game_object.players_inside:
-            print("_____________________________________________________________")
-            p.pocket += self.game_object.cards.new_card // len(self.game_object.players_inside)
-            print()
-            print(self.game_object.tell_probability())
-            print()
-            self.game_object.ask_explorer(p)
+        for player in self.game_object.players_inside:
+            self.game_object.console.first_trap_or_treasure_card_or_relics()
+            player.pocket += self.game_object.cards.new_card // len(self.game_object.players_inside)
+            self.game_object.ask_explorer(player)
 
 
 class Relics(New_Card):
@@ -49,12 +38,9 @@ class Relics(New_Card):
         self.game_object.relics_on_way += int(self.game_object.cards.new_card)
         self.game_object.cards.full_deck.remove(self.game_object.cards.new_card)
         self.game_object.identify_highest_diamonds()
-        for p in self.game_object.players_inside:
-            print("_____________________________________________________________")
-            print()
-            print(self.game_object.tell_probability())
-            print()
-            self.game_object.ask_explorer(p)
+        for player in self.game_object.players_inside:
+            self.game_object.console.first_trap_or_treasure_card_or_relics()
+            self.game_object.ask_explorer(player)
 
 class Draw_Card:
     def __init__(self, game_object):
@@ -67,19 +53,14 @@ class Draw_Card:
         else:
             return False
 
-    def tell_new_card(self):
-        print()
-        print(f"The drawn card was a {self.game_object.cards.new_card}")
-        print()
-
     def draw_card(self):
         self.game_object.cards.draw_card()
         self.game_object.calc_dying_prob()
         if self.check_second_trap():
             drawn_card = Second_Trap(self.game_object)
             drawn_card.act_on_card()
-        elif not self.check_second_trap():
-            self.tell_new_card()
+        else:
+            self.game_object.console.tell_new_card()
             if self.game_object.cards.new_card in self.game_object.cards.treasure_cards:
                 drawn_card = Treasure_Card(self.game_object)
                 drawn_card.act_on_card()
@@ -97,4 +78,4 @@ class Draw_Card:
             self.game_object.go_home_now.clear()
             self.game_object.players_inside = [p for p in self.game_object.explorers if p.inside]
             self.game_object.cards.played_cards.append(self.game_object.cards.new_card)
-            self.game_object.tell_played_cards()
+            self.game_object.console.tell_played_cards()
