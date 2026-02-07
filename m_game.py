@@ -1,8 +1,8 @@
 # Classes Player and Bot
-from Main_Game._player import Player, Bot
-from Main_Game._cards import Cards
-from Main_Game.NewCardEvent import Draw_Card
-from Main_Game.LevelStrategy import Act_On_Card
+from Main_Game.m_cards import Cards
+from Main_Game.m_NewCardEvent import Draw_Card
+from Main_Game.m_LevelStrategy import Act_On_Card
+from Main_Game.m_console import Console
 
 # Main_Game
 class Game:
@@ -25,71 +25,26 @@ class Game:
         self.undiscovered_diamonds = 0
         self.dying_prob = 0
         self.surviving_prob = 0
+        self.ev_next = 0
         self.amount_current_winner = 0
         self.amount_final_winner = 0
-
 
         # Create cards object
         self.cards = Cards(self)
 
+        # Create console object
+        self.console = Console(self)
 
-    # Welcome text
-    @staticmethod
-    def welcome_txt():
-        print()
-        print("****************************************")
-        print("* Welcome to Incan Gold - Bogi Edition *")
-        print("****************************************")
-        print()
-
-    # Create players
-    def create_players(self):
-        players_amount = input("How many players? ")
-        while not players_amount.isdigit() or int(players_amount) <= 0:
-            players_amount = input("That's not a valid number. How many players? ")
-        print()
-        print("________________________________________")
-        players_amount = int(players_amount)
-        for player_num in range(players_amount):
-            player_name = input(f"Enter player number {player_num + 1}'s name: ").capitalize()
-            self.players.append(Player(player_name=player_name, game_object=self))
-            print("________________________________________")
-
-
-    # Create bots
-    def create_bots(self):
-        print()
-        bots_amount = input("How many bots? ")
-        while not bots_amount.isdigit() or int(bots_amount) < 0:
-            bots_amount = input("That's not a valid number. How many bots? ")
-        print()
-        print("________________________________________")
-        bots_amount = int(bots_amount)
-        if bots_amount != 0:
-            for bots_num in range(bots_amount):
-                level_bot = input(f"Select a level for Bot {bots_num + 1} (careful: 1 / medium: 2 / risky: 3): ")
-                while not level_bot == "1" and not level_bot == "2" and not level_bot == "3" and not level_bot == "4":
-                    level_bot = input(
-                        f"{level_bot} is not valid. Select a level for Bot {bots_num + 1} (careful: 1 / medium: 2 / risky: 3): ")
-                level_bot = int(level_bot)
-                self.bots.append(Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
 
     # Create explorers
     def create_explorers(self):
-        self.create_players()
-        self.create_bots()
+        self.console.create_players()
+        self.console.create_bots()
         if len(self.bots) == 0:
             self.explorers = self.players
         else:
             self.explorers = self.players + self.bots
         self.players_inside = [p for p in self.explorers if p.inside]
-
-    # Current round
-    def tell_round(self):
-        print()
-        print("****************************************")
-        print(f"*               Round: {(self.rounds + 1)}               *")
-        print("****************************************")
 
     # Reset previous round and add relics
     def reset_round(self):
@@ -105,7 +60,7 @@ class Game:
     # Start Round
     def start_round(self):
         self.reset_round()
-        self.tell_round()
+        self.console.tell_round()
         self.p_inside = True
 
     # Check whether players inside
@@ -162,29 +117,23 @@ class Game:
         ev_next = self.surviving_prob * future_diamonds - self.dying_prob * player.guaranteed_diamonds
         return ev_next
 
-    # Tell situation
-    def tell_probability(self):
-        return f"The probability of dying in the next move is {self.dying_prob * 100:.1f}%"
-
-    def tell_relics_on_way(self):
-        if self.relics_on_way != 0:
-            print(f"There are relics worth {self.relics_on_way} diamonds on the way")
-
     # Identify diamonds of current winner
     def identify_highest_diamonds(self):
         self.amount_current_winner = 0
-        for c in self.explorers:
-            c_diamonds = c.chest + c.pocket + (self.diamonds_on_way // len(self.players_inside))
-            if self.amount_current_winner <= c_diamonds:
-                self.amount_current_winner = c_diamonds
+        for explorer in self.explorers:
+            e_diamonds = explorer.chest + explorer.pocket + (self.diamonds_on_way // len(self.players_inside))
+            if self.amount_current_winner <= e_diamonds:
+                self.amount_current_winner = e_diamonds
 
     # Ask the player / bot what he wants to do
-    def ask_explorer(self, p):
-        self.tell_relics_on_way()
-        if not p.is_bot:
-            p.ask_player()
-        elif len(self.bots) != 0 and p.is_bot:
-            act_on_card = Act_On_Card(self, p)
+    def ask_explorer(self, player):
+        self.console.tell_relics_on_way()
+        if not player.is_bot:
+            decision = self.console.ask_player(player)
+            if decision == "leave":
+                player.go_home()
+        elif len(self.bots) != 0 and player.is_bot:
+            act_on_card = Act_On_Card(self, player)
             act_on_card.ask_bot()
 
 
@@ -201,14 +150,6 @@ class Game:
             self.go_home_now[0].chest += self.relics_on_way
             self.relics_on_way = 0
 
-    # Tell the played cards
-    def tell_played_cards(self):
-        print()
-        print("Played Cards: ", end="")
-        for played_card in self.cards.played_cards:
-            print(played_card, end=" ")
-        print()
-
     # Still players inside
     def still_players_inside(self):
         if not self.no_players_inside():
@@ -224,32 +165,6 @@ class Game:
             elif self.amount_final_winner == s.chest:
                 self.final_winners.append(s)
 
-
-
-    # Present the result
-    def tell_result(self):
-        print()
-        print("_____________________________________________________________")
-        self.identify_game_winner()
-        for e in self.explorers:
-            print(f"{e.player_name} collected {e.chest} Diamonds")
-        print("_____________________________________________________________")
-        print()
-        print("*************************************************************")
-        if len(self.final_winners) == 1:
-            print(f"The winner is: {self.final_winners[0].player_name}")
-        else:
-            print(f"The winners are: ", end = "")
-            for winner in self.final_winners:
-                if winner == self.final_winners[-1]:
-                    print("& " + winner.player_name)
-                elif winner == self.final_winners[-2]:
-                    print(winner.player_name, end=" ")
-                else:
-                    print(winner.player_name, end=", ")
-        print("*************************************************************")
-        print()
-
     # Reset the game
     def reset_game(self):
         self.cards.traps = self.cards.snakes + self.cards.spiders + self.cards.fires + self.cards.avalanches + self.cards.mummies
@@ -262,16 +177,6 @@ class Game:
         print()
         self.create_explorers()
 
-    # Ask about playing again
-    def ask_again(self):
-        play_again = input("Do you want to play again? (Y/N) ").upper()
-        if play_again == "Y" or play_again == "YES":
-            self.reset_game()
-        else:
-            print()
-            print("Thanks for playing!")
-            self.is_running = False
-
     # Play 5 rounds and ask about playing again
     def play_rounds(self):
         for self.rounds in range(5):
@@ -279,12 +184,12 @@ class Game:
             while self.p_inside:
                 self.no_players_inside()
                 self.still_players_inside()
-        self.tell_result()
-        self.ask_again()
+        self.console.tell_result()
+        self.console.ask_again()
 
     # Main method
     def main(self):
-        Game.welcome_txt()
+        Console.welcome_txt(self)
         self.create_explorers()
         while self.is_running:
             self.play_rounds()
