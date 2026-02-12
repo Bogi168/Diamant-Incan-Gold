@@ -25,7 +25,7 @@ class Level_1(LevelStrategy):
 #        else:
 #            self.game_object.console.bot_stays_inside(self.current_bot)
 
-        if ((self.game_object.calc_ev_next_dia_on_way(self.current_bot) - self.current_bot.pocket - (self.game_object.diamonds_on_way // len(self.game_object.players_inside))) < 0
+        if ((self.game_object.prob_ev.calc_ev_next_dia_on_way(self.current_bot) - self.current_bot.pocket - (self.game_object.diamonds_on_way // len(self.game_object.players_inside))) < 0
                 and self.bool_diamonds_available()):
             self.game_object.console.bot_goes_home(self.current_bot)
             self.current_bot.go_home()
