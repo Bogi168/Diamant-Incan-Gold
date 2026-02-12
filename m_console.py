@@ -91,7 +91,7 @@ class Console:
     def tell_p_diamonds(self, player):
         print(f"You have {player.pocket} diamond(s) in your pocket")
         print(f"There is/are {self.game_object.diamonds_on_way} diamond(s) on the way home")
-        print(f"The expected value is {self.game_object.calc_ev_next(player):.2f}")
+        print(f"The expected value is {self.game_object.prob_ev.calc_ev_next_dia_on_way(player):.2f}")
         print("_____________________________________________________________")
 
     def ask_player(self, player):
