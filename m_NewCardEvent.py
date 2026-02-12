@@ -25,17 +25,17 @@ class First_Trap(New_Card):
 
 class Treasure_Card(New_Card):
     def act_on_card(self):
-        self.game_object.diamonds_on_way += self.game_object.cards.new_card % len(self.game_object.players_inside)
+        self.game_object.diamonds_on_way += self.game_object.cards.new_card.value % len(self.game_object.players_inside)
         self.game_object.identify_highest_diamonds()
         for player in self.game_object.players_inside:
             self.game_object.console.first_trap_or_treasure_card_or_relics()
-            player.pocket += self.game_object.cards.new_card // len(self.game_object.players_inside)
+            player.pocket += self.game_object.cards.new_card.value // len(self.game_object.players_inside)
             self.game_object.ask_explorer(player)
 
 
 class Relics(New_Card):
     def act_on_card(self):
-        self.game_object.relics_on_way += int(self.game_object.cards.new_card)
+        self.game_object.relics_on_way += self.game_object.cards.new_card.value
         self.game_object.cards.full_deck.remove(self.game_object.cards.new_card)
         self.game_object.identify_highest_diamonds()
         for player in self.game_object.players_inside:
@@ -47,7 +47,7 @@ class Draw_Card:
         self.game_object = game_object
 
     def check_second_trap(self):
-        if (self.game_object.cards.new_card in self.game_object.cards.traps and
+        if (self.game_object.cards.new_card.card_type == "trap" and
                 self.game_object.cards.new_card in self.game_object.cards.played_cards):
             return True
         else:
@@ -55,21 +55,21 @@ class Draw_Card:
 
     def draw_card(self):
         self.game_object.cards.draw_card()
-        self.game_object.calc_dying_prob()
+        self.game_object.prob_ev.calc_dying_prob()
         if self.check_second_trap():
             drawn_card = Second_Trap(self.game_object)
             drawn_card.act_on_card()
         else:
             self.game_object.console.tell_new_card()
-            if self.game_object.cards.new_card in self.game_object.cards.treasure_cards:
+            if self.game_object.cards.new_card.card_type == "treasure_card":
                 drawn_card = Treasure_Card(self.game_object)
                 drawn_card.act_on_card()
 
-            elif self.game_object.cards.new_card in self.game_object.cards.traps:
+            elif self.game_object.cards.new_card.card_type == "trap":
                 drawn_card = First_Trap(self.game_object)
                 drawn_card.act_on_card()
 
-            elif self.game_object.cards.new_card in self.game_object.cards.relics:
+            elif self.game_object.cards.new_card.card_type == "relic":
                 drawn_card = Relics(self.game_object)
                 drawn_card.act_on_card()
 
