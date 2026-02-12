@@ -1,17 +1,27 @@
 import random
 
+class Card:
+    def __init__(self, card_type, name, value = 0):
+        self.card_type = card_type
+        self.name = name
+        self.value = value
+
+    def __repr__(self):
+        return self.name
+
 class Cards:
     def __init__(self, game_object):
         self.game_object = game_object
         # Define cards
-        self.snakes = ["🐍"] * 3
-        self.spiders = ["🕷"] * 3
-        self.fires = ["🔥"] * 3
-        self.avalanches = ["🌑"] * 3
-        self.mummies = ["👤"] * 3
-        self.treasure_cards = [1, 2, 3, 4, 5, 5, 7, 7, 9, 11, 11, 13, 14, 15, 17]
-        self.relics = [5.01, 7.01, 8.01, 10.01, 12.01]
-        self.traps = self.snakes + self.spiders + self.fires + self.avalanches + self.mummies
+        self.traps = [Card("trap","🐍"),
+                      Card("trap", "🕷"),
+                      Card("trap", "🔥"),
+                      Card("trap", "🌑"),
+                      Card("trap", "👤")] * 3
+        self.treasure_cards = [Card("treasure_card", str(v), v)
+                            for v in [1, 2, 3, 4, 5, 5, 7, 7, 9, 11, 11, 13, 14, 15, 17]]
+        self.relics = [Card("relic", f"Relic ({r})", r)
+                       for r in [5, 7, 8, 10, 12]]
         self.full_deck = self.traps + self.treasure_cards
 
         # Define card lists
