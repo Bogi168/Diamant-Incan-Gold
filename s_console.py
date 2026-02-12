@@ -1,3 +1,4 @@
+from s_player import s_Bot
 from Main_Game.m_console import Console
 
 class s_Console(Console):
@@ -6,6 +7,15 @@ class s_Console(Console):
         while not bots_amount.isdigit() or int(bots_amount) <= 0:
             bots_amount = input("That's not a valid number. How many bots? ")
         self.game_object.bots_amount = int(bots_amount)
+
+    def select_bots_level(self):
+        for bots_num in range(self.game_object.bots_amount):
+            level_bot = input(f"Select a level for Bot {bots_num + 1} (1-13): ")
+            while not level_bot in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"):
+                level_bot = input(
+                    f"{level_bot} is not valid. Select a level for Bot {bots_num + 1} (1-13): ")
+            level_bot = int(level_bot)
+            self.game_object.explorers.append(s_Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self.game_object))
 
     def select_games_amount(self):
         games_amount = input("How many games? ")
