@@ -3,6 +3,7 @@ from Main_Game.m_cards import Cards
 from Main_Game.m_NewCardEvent import Draw_Card
 from Main_Game.m_LevelStrategy import Act_On_Card
 from Main_Game.m_console import Console
+from Main_Game.m_probability_and_ev import Probability_and_EV
 
 # Main_Game
 class Game:
@@ -31,6 +32,9 @@ class Game:
 
         # Create cards object
         self.cards = Cards(self)
+
+        # Create prob and ev object
+        self.prob_ev = Probability_and_EV(self)
 
         # Create console object
         self.console = Console(self)
@@ -70,52 +74,6 @@ class Game:
             return True
         else:
             return False
-
-    # Calculate probability of dying on the next move
-    def calc_dying_prob(self):
-        killing_traps = 0
-        probability = 0
-        self.cards.played_cards.append(self.cards.new_card)
-        for card in self.cards.played_cards:
-            if card in self.cards.traps:
-                traps_in_game = self.cards.deck.count(card)
-                killing_traps += traps_in_game
-        probability += killing_traps / len(self.cards.deck)
-        self.cards.played_cards.pop(-1)
-        self.dying_prob = probability
-        return probability
-
-    # Calculate amount of undiscovered diamonds
-    def calc_undiscovered_diamonds(self):
-        self.undiscovered_diamonds = 0
-        self.cards.played_cards.append(self.cards.new_card)
-        for card in self.cards.deck:
-            if card in self.cards.treasure_cards:
-                self.undiscovered_diamonds += card
-        self.cards.played_cards.pop(-1)
-
-    def calc_guaranteed_diamonds(self, player):
-        player.guaranteed_diamonds = player.pocket + self.diamonds_on_way // len(self.players_inside)
-        if len(self.players_inside) == 1:
-            player.guaranteed_diamonds += self.relics_on_way
-
-    def calc_ev_next(self, player):
-        self.calc_dying_prob()
-        self.surviving_prob = (1 - self.dying_prob)
-        self.calc_undiscovered_diamonds()
-        future_diamonds = (self.undiscovered_diamonds / (len(self.cards.deck) * len(self.players_inside))
-                           + player.pocket) #+ self.diamonds_on_way // len(self.players_inside))
-        ev_next = self.surviving_prob * future_diamonds - self.dying_prob * (player.pocket) #+ self.diamonds_on_way // len(self.players_inside))
-        return ev_next
-
-    def calc_ev_next_dia_on_way(self, player):
-        self.calc_dying_prob()
-        self.surviving_prob = (1 - self.dying_prob)
-        self.calc_undiscovered_diamonds()
-        self.calc_guaranteed_diamonds(player)
-        future_diamonds = self.undiscovered_diamonds / (len(self.cards.deck) * len(self.players_inside)) + player.guaranteed_diamonds
-        ev_next = self.surviving_prob * future_diamonds - self.dying_prob * player.guaranteed_diamonds
-        return ev_next
 
     # Identify diamonds of current winner
     def identify_highest_diamonds(self):
@@ -167,7 +125,6 @@ class Game:
 
     # Reset the game
     def reset_game(self):
-        self.cards.traps = self.cards.snakes + self.cards.spiders + self.cards.fires + self.cards.avalanches + self.cards.mummies
         self.cards.full_deck = self.cards.traps + self.cards.treasure_cards
         self.bots.clear()
         self.level_bots.clear()
