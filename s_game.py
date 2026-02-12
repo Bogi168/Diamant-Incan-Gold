@@ -1,6 +1,5 @@
 from Main_Game.m_game import Game
 from Simulation.s_console import s_Console
-from s_player import s_Bot
 from s_NewCardEvent import s_Draw_Card
 from s_LevelStrategy import s_Act_On_Card
 
@@ -14,19 +13,9 @@ class s_Game(Game):
 
     def create_explorers(self):
         self.console.select_bots_amount()
-        self.console.select_games_amount()
-        level_bot = 1
-        for bots_num in range(self.bots_amount):
-            if level_bot==4:
-                level_bot = 1
-            if level_bot == 1:
-                self.explorers.append(s_Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
-            elif level_bot == 2:
-                self.explorers.append(s_Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
-            elif level_bot == 3:
-                self.explorers.append(s_Bot(bot_name=f"Bot {bots_num + 1}", level=level_bot, game_object=self))
-            level_bot += 1
+        self.console.select_bots_level()
         self.players_inside = [p for p in self.explorers if p.inside]
+        self.console.select_games_amount()
 
     def start_round(self):
         self.reset_round()
@@ -86,7 +75,6 @@ class s_Game(Game):
                     e.max_diamonds = c
 
     def reset_game(self):
-        self.cards.traps = self.cards.snakes + self.cards.spiders + self.cards.fires + self.cards.avalanches + self.cards.mummies
         self.cards.full_deck = self.cards.traps + self.cards.treasure_cards
         for b in self.explorers:
             b.inside = True
