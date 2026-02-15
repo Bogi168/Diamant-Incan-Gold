@@ -87,3 +87,5 @@ class s_Game(Game):
             self.play_rounds()
             self.reset_game()
         self.console.tell_stats()
+        if self.bots_amount == 1:
+            self.console.ask_for_save()
