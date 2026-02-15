@@ -1,5 +1,6 @@
 from s_player import s_Bot
 from Main_Game.m_console import Console
+from s_stat_saver import *
 
 class s_Console(Console):
     def select_bots_amount(self):
@@ -36,3 +37,11 @@ class s_Console(Console):
             print(f"{e.bot_name} collected {e.max_diamonds} diamonds in his best round")
             print("******************************************************************")
             print()
+
+    def ask_for_save(self):
+        save_answer = input("Do you want to save the game statistics? (Y/N): ").lower()
+        if save_answer in ("y", "yes"):
+            save_statistics(self.game_object)
+            print("\n" + f"The stats were saved in {file_path} \n")
+        else:
+            print("\n" + "The stats were not saved. \n")
