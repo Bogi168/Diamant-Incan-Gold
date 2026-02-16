@@ -4,6 +4,7 @@ class s_Second_Trap(Second_Trap):
     def act_on_card(self):
         self.game_object.cards.full_deck.remove(self.game_object.cards.new_card)
         for player in self.game_object.players_inside:
+            player.die_counter += 1
             player.die()
         self.game_object.p_inside = False
 
@@ -32,7 +33,7 @@ class s_Relics(Relics):
 class s_Draw_Card(Draw_Card):
     def draw_card(self):
         self.game_object.cards.draw_card()
-        self.game_object.prob_ev.calc_dying_prob()
+        calc_dying_prob(game_object = self.game_object, cards_object = self.game_object.cards)
         if self.check_second_trap():
             drawn_card = s_Second_Trap(self.game_object)
             drawn_card.act_on_card()
