@@ -2,8 +2,7 @@
 from Main_Game.m_cards import Cards
 from Main_Game.m_NewCardEvent import Draw_Card
 from Main_Game.m_LevelStrategy import Act_On_Card
-from Main_Game.m_console import Console
-from Main_Game.m_probability_and_ev import Probability_and_EV
+from Main_Game.m_console import *
 
 # Main_Game
 class Game:
@@ -33,17 +32,10 @@ class Game:
         # Create cards object
         self.cards = Cards(self)
 
-        # Create prob and ev object
-        self.prob_ev = Probability_and_EV(self)
-
-        # Create console object
-        self.console = Console(self)
-
-
     # Create explorers
     def create_explorers(self):
-        self.console.create_players()
-        self.console.create_bots()
+        console_create_players(game_object = self)
+        console_create_bots(game_object = self)
         if len(self.bots) == 0:
             self.explorers = self.players
         else:
@@ -64,7 +56,7 @@ class Game:
     # Start Round
     def start_round(self):
         self.reset_round()
-        self.console.tell_round()
+        console_tell_round(game_object = self)
         self.p_inside = True
 
     # Check whether players inside
@@ -84,14 +76,14 @@ class Game:
                 self.amount_current_winner = e_diamonds
 
     # Ask the player / bot what he wants to do
-    def ask_explorer(self, player):
-        self.console.tell_relics_on_way()
-        if not player.is_bot:
-            decision = self.console.ask_player(player)
+    def ask_explorer(self, current_player):
+        console_tell_relics_on_way(game_object = self)
+        if not current_player.is_bot:
+            decision = console_ask_player(game_object = self, cards_object = self.cards, current_player = current_player)
             if decision == "leave":
-                player.go_home()
-        elif len(self.bots) != 0 and player.is_bot:
-            act_on_card = Act_On_Card(self, player)
+                current_player.go_home()
+        elif len(self.bots) != 0 and current_player.is_bot:
+            act_on_card = Act_On_Card(self, current_player)
             act_on_card.ask_bot()
 
 
@@ -141,12 +133,12 @@ class Game:
             while self.p_inside:
                 self.no_players_inside()
                 self.still_players_inside()
-        self.console.tell_result()
-        self.console.ask_again()
+        console_tell_result(game_object = self)
+        console_ask_again(game_object = self)
 
     # Main method
     def main(self):
-        Console.welcome_txt(self)
+        console_welcome_txt()
         self.create_explorers()
         while self.is_running:
             self.play_rounds()
