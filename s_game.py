@@ -1,7 +1,7 @@
 from Main_Game.m_game import Game
-from Simulation.s_console import s_Console
 from s_NewCardEvent import s_Draw_Card
 from s_LevelStrategy import s_Act_On_Card
+from Simulation.s_console import *
 
 
 class s_Game(Game):
@@ -9,21 +9,20 @@ class s_Game(Game):
         super().__init__()
         self.bots_amount = 0
         self.games_amount = 0
-        self.console = s_Console(self)
 
     def create_explorers(self):
-        self.console.select_bots_amount()
-        self.console.select_bots_level()
+        console_select_bots_amount(game_object = self)
+        console_select_bots_level(game_object = self)
         self.players_inside = [p for p in self.explorers if p.inside]
-        self.console.select_games_amount()
+        console_select_games_amount(game_object = self)
 
     def start_round(self):
         self.reset_round()
         self.p_inside = True
 
-    def ask_explorer(self, player):
+    def ask_explorer(self, current_player):
         if len(self.explorers) != 0:
-            act_on_card = s_Act_On_Card(self, player)
+            act_on_card = s_Act_On_Card(self, current_player)
             act_on_card.ask_bot()
 
     def still_players_inside(self):
@@ -86,6 +85,6 @@ class s_Game(Game):
         for game_num in range(self.games_amount):
             self.play_rounds()
             self.reset_game()
-        self.console.tell_stats()
+        console_tell_stats(game_object = self)
         if self.bots_amount == 1:
-            self.console.ask_for_save()
+            console_ask_for_save(game_object = self)
