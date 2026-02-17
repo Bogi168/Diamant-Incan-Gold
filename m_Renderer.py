@@ -2,8 +2,12 @@ from abc import ABC, abstractmethod
 
 class Renderer(ABC):
     @abstractmethod
-    def render(self, message):
+    def render_game(self, message):
         pass
+
+    @abstractmethod
+    def render_system(self, message):
+        print(message)
 
     @abstractmethod
     def ask_players_amount(self):
@@ -58,7 +62,10 @@ class Renderer(ABC):
         pass
 
 class ConsoleRenderer(Renderer):
-    def render(self, message):
+    def render_game(self, message):
+        print(message)
+
+    def render_system(self, message):
         print(message)
 
     def ask_players_amount(self):
@@ -101,7 +108,10 @@ class ConsoleRenderer(Renderer):
         pass
 
 class SimulationRenderer(Renderer):
-    def render(self, message):
+    def render_game(self, message):
+        pass
+
+    def render_system(self, message):
         print(message)
 
     def ask_players_amount(self):
