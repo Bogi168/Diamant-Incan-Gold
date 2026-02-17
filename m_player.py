@@ -46,3 +46,10 @@ class Bot(Player):
         self.level = level
         self.bot_name = bot_name
         self.diamonds = 0
+        self.game_winning_count = 0
+        self.round_winning_count = 0
+        self.die_counter = 0
+        self.prev_round_chest = 0
+        self.diamond_count = 0
+        self.collected_diamonds = []
+        self.max_diamonds = 0
