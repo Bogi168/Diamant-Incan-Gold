@@ -29,13 +29,13 @@ def render_select_games_amount(game_object):
 def render_tell_stats(game_object):
     game_object.get_max_diamonds()
     for explorer in game_object.explorers:
-        game_object.renderer.render(self = game_object.renderer, message = tell_stats(game_object = game_object, explorer = explorer))
+        game_object.renderer.render_system(self = game_object.renderer, message = tell_stats(game_object = game_object, explorer = explorer))
 
 def render_ask_for_save(game_object):
     file_path = "s_stats.txt"
     save_answer = game_object.renderer.ask_for_save(self= game_object.renderer)
     if save_answer in ("Y", "YES"):
         save_statistics(game_object = game_object, file_path = file_path)
-        game_object.renderer.render(self = game_object.renderer, message = save_stats(file_path = file_path))
+        game_object.renderer.render_system(self = game_object.renderer, message = save_stats(file_path = file_path))
     else:
-        game_object.renderer.render(self = game_object.renderer, message = delete_stats())
+        game_object.renderer.render_system(self = game_object.renderer, message = delete_stats())
