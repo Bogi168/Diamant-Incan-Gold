@@ -1,13 +1,13 @@
 from Main_Game.m_game import Game
 from Main_Game.m_New_Card_Event import Draw_Card
-from Simulation.s_Level_Strategy import s_Act_On_Card
+from Main_Game.m_Level_Strategy import Act_On_Card
 from Simulation.s_renders import *
 from Main_Game.m_Renderer import SimulationRenderer
 
 
 class s_Game(Game):
     def __init__(self):
-        super().__init__(renderer = SimulationRenderer)
+        super().__init__(renderer = SimulationRenderer, bool_adjust_risk_last_round = False)
         self.bots_amount = 0
         self.games_amount = 0
 
@@ -27,7 +27,7 @@ class s_Game(Game):
 
     def ask_explorer(self, current_player):
         if len(self.explorers) != 0:
-            act_on_card = s_Act_On_Card(self, current_player)
+            act_on_card = Act_On_Card(self, current_player)
             act_on_card.ask_bot()
 
     def still_players_inside(self):

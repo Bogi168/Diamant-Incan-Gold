@@ -27,6 +27,10 @@ def calc_guaranteed_diamonds(game_object, current_player):
         guaranteed_diamonds += game_object.relics_on_way
     return guaranteed_diamonds
 
+def calc_current_diamonds(game_object, current_player):
+    current_diamonds = current_player.chest + calc_guaranteed_diamonds(game_object = game_object, current_player = current_player)
+    return current_diamonds
+
 def calc_future_diamonds(game_object, cards_object, current_player):
     guaranteed_diamonds = current_player.guaranteed_diamonds
     future_diamonds =  (game_object.undiscovered_diamonds /

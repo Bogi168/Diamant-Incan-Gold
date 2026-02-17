@@ -26,7 +26,7 @@ def render_create_bots(game_object):
         for bot_num in range(bots_amount):
             game_object.renderer.render_game(self = game_object.renderer, message=dashes_3())
             level_bot = game_object.renderer.ask_bot_level(self = game_object.renderer, bot_num = bot_num)
-            while not level_bot in ("1", "2", "3", "4"):
+            while not level_bot in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"):
                 level_bot = game_object.renderer.re_ask_bot_level(self = game_object.renderer, bot_num = bot_num)
             level_bot = int(level_bot)
             game_object.bots.append(Bot(bot_name = f"Bot {bot_num + 1}", level = level_bot, game_object = game_object))

@@ -1,4 +1,4 @@
-from Main_Game.m_probability_and_ev import calc_future_diamonds, calc_guaranteed_diamonds, calc_ev_next
+from Main_Game.m_probability_and_ev import calc_future_diamonds, calc_guaranteed_diamonds, calc_ev_next, calc_current_diamonds
 
 
 # Class Player
@@ -24,6 +24,10 @@ class Player:
         return calc_guaranteed_diamonds(game_object = self.game_object, current_player = self)
 
     @property
+    def current_diamonds(self):
+        return calc_current_diamonds(game_object = self.game_object, current_player = self)
+
+    @property
     def ev_next(self):
         return calc_ev_next(game_object = self.game_object, current_player = self)
 
@@ -47,7 +51,6 @@ class Bot(Player):
         super().__init__(player_name = bot_name, game_object=game_object, is_bot = True)
         self.level = level
         self.bot_name = bot_name
-        self.diamonds = 0
         self.game_winning_count = 0
         self.round_winning_count = 0
         self.prev_round_chest = 0

@@ -84,10 +84,10 @@ class ConsoleRenderer(Renderer):
         return input("That's not a valid number. How many bots? ")
 
     def ask_bot_level(self, bot_num):
-        return input(f"Select a level for Bot {bot_num + 1} (careful: 1 / medium: 2 / risky: 3): ")
+        return input(f"Select a level for Bot {bot_num + 1} (1-13): ")
 
     def re_ask_bot_level(self, bot_num):
-        return input(f"That's not a valid level. Select a level for Bot {bot_num + 1} (careful: 1 / medium: 2 / risky: 3): ")
+        return input(f"That's not a valid level. Select a level for Bot {bot_num + 1} (1-13): ")
 
     def ask_games_amount(self):
         pass

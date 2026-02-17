@@ -8,7 +8,10 @@ from Main_Game.m_probability_and_ev import calc_dying_prob, calc_undiscovered_di
 
 # Main_Game
 class Game:
-    def __init__(self, renderer):
+    def __init__(self, renderer, bool_adjust_risk_last_round = True):
+        self.renderer = renderer
+        self.bool_adjust_risk_last_round = bool_adjust_risk_last_round
+
         # Define explorer lists
         self.players = []
         self.level_bots = []
@@ -27,9 +30,6 @@ class Game:
 
         # Create cards object
         self.cards = Cards(self)
-
-        # Create renderer
-        self.renderer = renderer
 
     @property
     def dying_prob(self):
