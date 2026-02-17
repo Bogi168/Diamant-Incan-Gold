@@ -1,4 +1,4 @@
-from Main_Game.m_NewCardEvent import *
+from Main_Game.m_New_Card_Event import *
 
 class s_Second_Trap(Second_Trap):
     def act_on_card(self):
@@ -10,14 +10,12 @@ class s_Second_Trap(Second_Trap):
 
 class s_First_Trap(First_Trap):
     def act_on_card(self):
-        self.game_object.identify_highest_diamonds()
         for player in self.game_object.players_inside:
             self.game_object.ask_explorer(player)
 
 class s_Treasure_Card(Treasure_Card):
     def act_on_card(self):
         self.game_object.diamonds_on_way += self.game_object.cards.new_card.value % len(self.game_object.players_inside)
-        self.game_object.identify_highest_diamonds()
         for player in self.game_object.players_inside:
             player.pocket += self.game_object.cards.new_card.value // len(self.game_object.players_inside)
             self.game_object.ask_explorer(player)
@@ -26,14 +24,12 @@ class s_Relics(Relics):
     def act_on_card(self):
         self.game_object.relics_on_way += self.game_object.cards.new_card.value
         self.game_object.cards.full_deck.remove(self.game_object.cards.new_card)
-        self.game_object.identify_highest_diamonds()
         for player in self.game_object.players_inside:
             self.game_object.ask_explorer(player)
 
 class s_Draw_Card(Draw_Card):
     def draw_card(self):
         self.game_object.cards.draw_card()
-        calc_dying_prob(game_object = self.game_object, cards_object = self.game_object.cards)
         if self.check_second_trap():
             drawn_card = s_Second_Trap(self.game_object)
             drawn_card.act_on_card()
