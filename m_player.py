@@ -12,6 +12,7 @@ class Player:
         self.inside = True
         self.pocket = 0
         self.chest = 0
+        self.die_counter = 0
 
     # Properties
     @property
@@ -37,6 +38,7 @@ class Player:
     def die(self):
         self.pocket = 0
         self.inside = False
+        self.die_counter += 1
 
 # Class Bot
 class Bot(Player):
@@ -48,7 +50,6 @@ class Bot(Player):
         self.diamonds = 0
         self.game_winning_count = 0
         self.round_winning_count = 0
-        self.die_counter = 0
         self.prev_round_chest = 0
         self.diamond_count = 0
         self.collected_diamonds = []
