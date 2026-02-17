@@ -1,14 +1,30 @@
+from Main_Game.m_probability_and_ev import calc_future_diamonds, calc_guaranteed_diamonds, calc_ev_next
+
+
 # Class Player
 class Player:
     def __init__(self, player_name, game_object, is_bot = False):
-        # Player variables
         self.player_name = player_name
         self.game_object = game_object
+        self.is_bot = is_bot
+
+        # Player variables
         self.inside = True
         self.pocket = 0
         self.chest = 0
-        self.guaranteed_diamonds = 0
-        self.is_bot = is_bot
+
+    # Properties
+    @property
+    def future_diamonds(self):
+        return calc_future_diamonds(game_object = self.game_object, cards_object = self.game_object.cards, current_player = self)
+
+    @property
+    def guaranteed_diamonds(self):
+        return calc_guaranteed_diamonds(game_object = self.game_object, current_player = self)
+
+    @property
+    def ev_next(self):
+        return calc_ev_next(game_object = self.game_object, current_player = self)
 
     # Player goes home
     def go_home(self):
