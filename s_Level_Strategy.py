@@ -1,5 +1,5 @@
-from Main_Game.m_LevelStrategy import *
-from Main_Game.m_probability_and_ev import calc_ev_next, calc_guaranteed_diamonds, calc_undiscovered_diamonds
+from Main_Game.m_Level_Strategy import *
+from Main_Game.m_probability_and_ev import calc_ev_next_without_dia_on_way
 
 class s_Level_1(LevelStrategy):
     def action(self):
@@ -18,61 +18,53 @@ class s_Level_3(LevelStrategy):
 
 class s_Level_4(LevelStrategy):
     def action(self):
-        if ((calc_ev_next_dia_on_way(game_object = self.game_object, cards_object = self.game_object.cards, current_player = self.current_bot) - self.current_bot.guaranteed_diamonds) < 0
+        if ((self.current_bot.ev_next - self.current_bot.guaranteed_diamonds) < 0
                 and self.bool_diamonds_available()):
             self.current_bot.go_home()
 
 class s_Level_5(LevelStrategy):
     def action(self):
-        if (calc_ev_next(game_object = self.game_object, cards_object = self.game_object.cards, current_player = self.current_bot)
+        if (calc_ev_next_without_dia_on_way(game_object = self.game_object, current_player = self.current_bot)
             - self.current_bot.pocket) < 0 and self.bool_diamonds_available():
             self.current_bot.go_home()
 
 class s_Level_6(LevelStrategy):
     def action(self):
-        calc_undiscovered_diamonds(game_object = self.game_object, cards_object = self.game_object.cards)
-        if self.game_object.undiscovered_diamonds < 50:
+        if self.game_object.undiscovered_diamonds < 85:
             self.current_bot.go_home()
 
 class s_Level_7(LevelStrategy):
     def action(self):
-        calc_undiscovered_diamonds(game_object = self.game_object, cards_object = self.game_object.cards)
-        if self.game_object.undiscovered_diamonds < 70:
+        if self.game_object.undiscovered_diamonds < 100:
             self.current_bot.go_home()
 
 class s_Level_8(LevelStrategy):
     def action(self):
-        calc_guaranteed_diamonds(game_object = self.game_object, current_player = self.current_bot)
         if self.current_bot.guaranteed_diamonds > 5 and self.game_object.dying_prob > 0:
             self.current_bot.go_home()
 
 class s_Level_9(LevelStrategy):
     def action(self):
-        calc_guaranteed_diamonds(game_object = self.game_object, current_player = self.current_bot)
         if self.current_bot.guaranteed_diamonds > 8 and self.game_object.dying_prob > 0:
             self.current_bot.go_home()
 
 class s_Level_10(LevelStrategy): # bester Bot
     def action(self):
-        calc_guaranteed_diamonds(game_object = self.game_object, current_player = self.current_bot)
         if self.current_bot.guaranteed_diamonds > 12 and self.game_object.dying_prob > 0:
             self.current_bot.go_home()
 
 class s_Level_11(LevelStrategy):
     def action(self):
-        calc_guaranteed_diamonds(game_object = self.game_object, current_player = self.current_bot)
         if self.current_bot.guaranteed_diamonds > 5 and self.game_object.dying_prob > 0.08:
             self.current_bot.go_home()
 
 class s_Level_12(LevelStrategy): # Top 3 Bot, wahrscheinlich zweitbester
     def action(self):
-        calc_guaranteed_diamonds(game_object = self.game_object, current_player = self.current_bot)
         if self.current_bot.guaranteed_diamonds > 8 and self.game_object.dying_prob > 0.08:
             self.current_bot.go_home()
 
 class s_Level_13(LevelStrategy): # Top 3 Bot
     def action(self):
-        calc_guaranteed_diamonds(game_object = self.game_object, current_player = self.current_bot)
         if self.current_bot.guaranteed_diamonds > 12 and self.game_object.dying_prob > 0.08:
             self.current_bot.go_home()
 
