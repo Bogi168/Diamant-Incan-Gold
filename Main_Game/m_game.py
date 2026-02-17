@@ -1,9 +1,9 @@
 # Classes Player and Bot
-from Main_Game.m_cards import Cards
-from Main_Game.m_New_Card_Event import Draw_Card
-from Main_Game.m_Level_Strategy import Act_On_Card
+from Main_Game.cards import Cards
+from Main_Game.New_Card_Event import Draw_Card
+from Main_Game.Level_Strategy import Act_On_Card
 from Main_Game.m_renders import *
-from Main_Game.m_probability_and_ev import calc_dying_prob, calc_undiscovered_diamonds
+from Main_Game.probability_and_ev import calc_dying_prob, calc_undiscovered_diamonds
 
 
 # Main_Game

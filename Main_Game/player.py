@@ -1,4 +1,4 @@
-from Main_Game.m_probability_and_ev import calc_future_diamonds, calc_guaranteed_diamonds, calc_ev_next, calc_current_diamonds
+from Main_Game.probability_and_ev import calc_future_diamonds, calc_guaranteed_diamonds, calc_ev_next, calc_current_diamonds
 
 
 # Class Player

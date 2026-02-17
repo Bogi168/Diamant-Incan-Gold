@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from Main_Game.m_renders import render_bot_goes_home, render_bot_stays_inside, render_tell_b_diamonds
-from Main_Game.m_probability_and_ev import calc_ev_next_without_dia_on_way
+from Main_Game.probability_and_ev import calc_ev_next_without_dia_on_way
 
 
 class LevelStrategy(ABC):

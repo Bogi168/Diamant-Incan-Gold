@@ -1,8 +1,8 @@
 from Main_Game.m_game import Game
-from Main_Game.m_New_Card_Event import Draw_Card
-from Main_Game.m_Level_Strategy import Act_On_Card
+from Main_Game.New_Card_Event import Draw_Card
+from Main_Game.Level_Strategy import Act_On_Card
 from Simulation.s_renders import *
-from Main_Game.m_Renderer import SimulationRenderer
+from Main_Game.Renderer import SimulationRenderer
 
 
 class s_Game(Game):

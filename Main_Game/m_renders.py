@@ -1,5 +1,5 @@
-from Main_Game.m_player import Player, Bot
-from Main_Game.m_text import *
+from Main_Game.player import Player, Bot
+from Main_Game.text import *
 
 def render_welcome_txt(game_object):
     game_object.renderer.render_system(self = game_object, message = welcome_txt())

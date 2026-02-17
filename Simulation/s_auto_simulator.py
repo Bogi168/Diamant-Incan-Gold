@@ -1,6 +1,6 @@
 from Simulation.s_stat_saver import save_statistics
 from Simulation.s_renders import render_select_games_amount
-from Main_Game.m_player import Bot
+from Main_Game.player import Bot
 from Simulation.s_game import s_Game
 
 file_path = "s_auto_simulation"

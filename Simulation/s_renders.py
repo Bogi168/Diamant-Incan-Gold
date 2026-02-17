@@ -1,6 +1,6 @@
-from Main_Game.m_player import Bot
+from Main_Game.player import Bot
 from Simulation.s_stat_saver import *
-from Main_Game.m_text import *
+from Main_Game.text import *
 
 def render_select_bots_amount(game_object):
     bots_amount = game_object.renderer.ask_bots_amount(self = game_object.renderer)
