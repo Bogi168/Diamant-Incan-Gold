@@ -1,12 +1,14 @@
 # Classes Player and Bot
 from Main_Game.m_cards import Cards
-from Main_Game.m_NewCardEvent import Draw_Card
-from Main_Game.m_LevelStrategy import Act_On_Card
-from Main_Game.m_console import *
+from Main_Game.m_New_Card_Event import Draw_Card
+from Main_Game.m_Level_Strategy import Act_On_Card
+from Main_Game.m_renders import *
+from Main_Game.m_probability_and_ev import calc_dying_prob, calc_undiscovered_diamonds
+
 
 # Main_Game
 class Game:
-    def __init__(self):
+    def __init__(self, renderer):
         # Define explorer lists
         self.players = []
         self.level_bots = []
@@ -22,20 +24,30 @@ class Game:
         self.p_inside = True
         self.diamonds_on_way = 0
         self.relics_on_way = 0
-        self.undiscovered_diamonds = 0
-        self.dying_prob = 0
-        self.surviving_prob = 0
-        self.ev_next = 0
-        self.amount_current_winner = 0
-        self.amount_final_winner = 0
 
         # Create cards object
         self.cards = Cards(self)
 
+        # Create renderer
+        self.renderer = renderer
+
+    @property
+    def dying_prob(self):
+        return calc_dying_prob(cards_object = self.cards)
+
+    @property
+    def undiscovered_diamonds(self):
+        return calc_undiscovered_diamonds(cards_object = self.cards)
+
+    @property
+    def amount_current_winner(self):
+        return self.identify_highest_diamonds()
+
+
     # Create explorers
     def create_explorers(self):
-        console_create_players(game_object = self)
-        console_create_bots(game_object = self)
+        render_create_players(game_object = self)
+        render_create_bots(game_object = self)
         if len(self.bots) == 0:
             self.explorers = self.players
         else:
@@ -56,7 +68,7 @@ class Game:
     # Start Round
     def start_round(self):
         self.reset_round()
-        console_tell_round(game_object = self)
+        render_tell_round(game_object = self)
         self.p_inside = True
 
     # Check whether players inside
@@ -69,17 +81,18 @@ class Game:
 
     # Identify diamonds of current winner
     def identify_highest_diamonds(self):
-        self.amount_current_winner = 0
+        amount_current_winner = 0
         for explorer in self.explorers:
             e_diamonds = explorer.chest + explorer.pocket + (self.diamonds_on_way // len(self.players_inside))
-            if self.amount_current_winner <= e_diamonds:
-                self.amount_current_winner = e_diamonds
+            if amount_current_winner <= e_diamonds:
+                amount_current_winner = e_diamonds
+        return amount_current_winner
 
     # Ask the player / bot what he wants to do
     def ask_explorer(self, current_player):
-        console_tell_relics_on_way(game_object = self)
+        render_tell_relics_on_way(game_object = self)
         if not current_player.is_bot:
-            decision = console_ask_player(game_object = self, cards_object = self.cards, current_player = current_player)
+            decision = render_ask_player(game_object = self, current_player = current_player)
             if decision == "leave":
                 current_player.go_home()
         elif len(self.bots) != 0 and current_player.is_bot:
@@ -107,13 +120,14 @@ class Game:
             drawcard.draw_card()
 
     def identify_game_winner(self):
-        for s in self.explorers:
-            if self.amount_final_winner < s.chest:
-                self.amount_final_winner = s.chest
+        amount_final_winner = 0
+        for explorer in self.explorers:
+            if amount_final_winner < explorer.chest:
+                amount_final_winner = explorer.chest
                 self.final_winners.clear()
-                self.final_winners.append(s)
-            elif self.amount_final_winner == s.chest:
-                self.final_winners.append(s)
+                self.final_winners.append(explorer)
+            elif amount_final_winner == explorer.chest:
+                self.final_winners.append(explorer)
 
     # Reset the game
     def reset_game(self):
@@ -123,7 +137,6 @@ class Game:
         self.players.clear()
         self.explorers.clear()
         self.final_winners.clear()
-        print()
         self.create_explorers()
 
     # Play 5 rounds and ask about playing again
@@ -133,12 +146,12 @@ class Game:
             while self.p_inside:
                 self.no_players_inside()
                 self.still_players_inside()
-        console_tell_result(game_object = self)
-        console_ask_again(game_object = self)
+        render_tell_result(game_object = self)
+        render_ask_again(game_object = self)
 
     # Main method
     def main(self):
-        console_welcome_txt()
+        render_welcome_txt(game_object = self)
         self.create_explorers()
         while self.is_running:
             self.play_rounds()
