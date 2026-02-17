@@ -1,6 +1,6 @@
 from Simulation.s_stat_saver import save_statistics
 from Simulation.s_renders import render_select_games_amount
-from Simulation.s_player import s_Bot
+from Main_Game.m_player import Bot
 from Simulation.s_game import s_Game
 
 file_path = "s_auto_simulation"
@@ -12,7 +12,7 @@ class s_Auto_Game(s_Game):
 
     def create_bot(self):
         self.explorers.append(
-            s_Bot(bot_name=f"Bot {self.level_bot}", level = self.level_bot, game_object = self))
+            Bot(bot_name=f"Bot {self.level_bot}", level = self.level_bot, game_object = self))
 
     def main(self):
         render_select_games_amount(game_object = self)
