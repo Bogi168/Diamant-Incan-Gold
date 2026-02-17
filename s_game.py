@@ -1,24 +1,29 @@
 from Main_Game.m_game import Game
-from s_NewCardEvent import s_Draw_Card
-from s_LevelStrategy import s_Act_On_Card
-from Simulation.s_console import *
+from Simulation.s_New_Card_Event import s_Draw_Card
+from Simulation.s_Level_Strategy import s_Act_On_Card
+from Simulation.s_renders import *
+from Main_Game.m_Renderer import SimulationRenderer
 
 
 class s_Game(Game):
     def __init__(self):
-        super().__init__()
+        super().__init__(renderer = SimulationRenderer)
         self.bots_amount = 0
         self.games_amount = 0
 
     def create_explorers(self):
-        console_select_bots_amount(game_object = self)
-        console_select_bots_level(game_object = self)
+        render_create_bots(game_object = self)
         self.players_inside = [p for p in self.explorers if p.inside]
-        console_select_games_amount(game_object = self)
+        render_select_games_amount(game_object = self)
+
+    def save_prev_round_chest(self):
+        for current_bot in self.explorers:
+            current_bot.prev_round_chest = current_bot.chest
 
     def start_round(self):
         self.reset_round()
         self.p_inside = True
+        self.save_prev_round_chest()
 
     def ask_explorer(self, current_player):
         if len(self.explorers) != 0:
@@ -31,31 +36,32 @@ class s_Game(Game):
             drawcard.draw_card()
 
     def identify_round_winner(self):
-        self.final_winners.clear()
-        self.amount_final_winner = 0
-        for s in self.explorers:
-            if self.amount_final_winner < s.chest:
-                self.amount_final_winner = s.chest
-                self.final_winners.clear()
-                self.final_winners.append(s)
-            elif self.amount_final_winner == s.chest:
-                self.final_winners.append(s)
-            s.diamond_count += s.chest
-            s.collected_diamonds.append(s.chest)
-        for w in self.final_winners:
-            w.round_winning_count += 1
+        round_winners = []
+        amount_round_winner = 0
+        for explorer in self.explorers:
+            booty = explorer.chest - explorer.prev_round_chest
+            if amount_round_winner < booty:
+                amount_round_winner = booty
+                round_winners.clear()
+                round_winners.append(explorer)
+            elif amount_round_winner == booty:
+                round_winners.append(explorer)
+            explorer.diamond_count += explorer.chest
+            explorer.collected_diamonds.append(explorer.chest)
+        for winner in round_winners:
+            winner.round_winning_count += 1
 
     def identify_game_winner(self):
-        self.final_winners.clear()
-        self.amount_final_winner = 0
+        final_winners = []
+        amount_final_winner = 0
         for s in self.explorers:
-            if self.amount_final_winner < s.chest:
-                self.amount_final_winner = s.chest
-                self.final_winners.clear()
-                self.final_winners.append(s)
-            elif self.amount_final_winner == s.chest:
-                self.final_winners.append(s)
-        for w in self.final_winners:
+            if amount_final_winner < s.chest:
+                amount_final_winner = s.chest
+                final_winners.clear()
+                final_winners.append(s)
+            elif amount_final_winner == s.chest:
+                final_winners.append(s)
+        for w in final_winners:
             w.game_winning_count += 1
 
     def play_rounds(self):
@@ -85,6 +91,6 @@ class s_Game(Game):
         for game_num in range(self.games_amount):
             self.play_rounds()
             self.reset_game()
-        console_tell_stats(game_object = self)
+        render_tell_stats(game_object = self)
         if self.bots_amount == 1:
-            console_ask_for_save(game_object = self)
+            render_ask_for_save(game_object = self)
