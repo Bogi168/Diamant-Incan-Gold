@@ -47,7 +47,7 @@ class s_Game(Game):
             elif amount_round_winner == booty:
                 round_winners.append(explorer)
             explorer.diamond_count += explorer.chest
-            explorer.collected_diamonds.append(explorer.chest)
+            explorer.collected_diamonds.append(booty)
         for winner in round_winners:
             winner.round_winning_count += 1
 
