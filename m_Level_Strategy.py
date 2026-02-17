@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
-from Main_Game.m_probability_and_ev import calc_ev_next_dia_on_way
-from Main_Game.m_console import console_bot_goes_home, console_bot_stays_inside, console_tell_b_diamonds
+from Main_Game.m_renders import render_bot_goes_home, render_bot_stays_inside, render_tell_b_diamonds
 
 class LevelStrategy(ABC):
     def __init__(self, current_bot, game_object):
@@ -27,19 +26,19 @@ class Level_1(LevelStrategy):
 #        else:
 #            self.game_object.console.bot_stays_inside(self.current_bot)
 
-        if ((calc_ev_next_dia_on_way(game_object = self.game_object, cards_object = self.game_object.cards, current_player = self.current_bot)
-             - self.current_bot.pocket - (self.game_object.diamonds_on_way // len(self.game_object.players_inside))) < 0
+        if ((self.current_bot.ev_next - self.current_bot.pocket
+             - (self.game_object.diamonds_on_way // len(self.game_object.players_inside))) < 0
                 and self.bool_diamonds_available()):
-            console_bot_goes_home(current_bot = self.current_bot)
+            render_bot_goes_home(game_object = self.game_object, current_bot = self.current_bot)
             self.current_bot.go_home()
 
         else:
-            console_bot_stays_inside(current_bot = self.current_bot)
+            render_bot_stays_inside(game_object = self.game_object, current_bot = self.current_bot)
 
 class Level_2(LevelStrategy):
     def action(self):
         if self.game_object.dying_prob > 0.17 and self.bool_diamonds_available():
-            console_bot_goes_home(current_bot = self.current_bot)
+            render_bot_goes_home(game_object = self.game_object, current_bot = self.current_bot)
             self.current_bot.go_home()
 
 #        if (self.game_object.calc_ev_next(self.current_bot) - self.current_bot.pocket) < 0 and self.bool_diamonds_available():
@@ -47,33 +46,33 @@ class Level_2(LevelStrategy):
 #            self.current_bot.go_home()
 
         else:
-            console_bot_stays_inside(current_bot = self.current_bot)
+            render_bot_stays_inside(game_object = self.game_object, current_bot = self.current_bot)
 
 class Level_3(LevelStrategy):
     def action(self):
         if self.game_object.dying_prob > 0.25 and self.bool_diamonds_available():
-                console_bot_goes_home(current_bot = self.current_bot)
+                render_bot_goes_home(game_object = self.game_object, current_bot = self.current_bot)
                 self.current_bot.go_home()
         else:
-                console_bot_stays_inside(current_bot = self.current_bot)
+                render_bot_stays_inside(game_object = self.game_object, current_bot = self.current_bot)
 
 class Level_4(LevelStrategy):
     def action(self):
         if self.game_object.dying_prob > 0.20 and self.bool_diamonds_available():
-                console_bot_goes_home(current_bot = self.current_bot)
+                render_bot_goes_home(game_object = self.game_object, current_bot = self.current_bot)
                 self.current_bot.go_home()
 
         elif self.amount_available_diamonds / len(self.game_object.players_inside) > 10 :
-            console_bot_goes_home(current_bot = self.current_bot)
+            render_bot_goes_home(game_object = self.game_object, current_bot = self.current_bot)
             self.current_bot.go_home()
 
         else:
-            console_bot_stays_inside(current_bot = self.current_bot)
+            render_bot_stays_inside(game_object = self.game_object, current_bot = self.current_bot)
 
 class Level_Last_Round(LevelStrategy):
     def action(self):
         if (self.game_object.amount_current_winner - 20) <= self.current_bot.diamonds < self.game_object.amount_current_winner:
-            console_bot_stays_inside(current_bot = self.current_bot)
+            render_bot_stays_inside(game_object = self.game_object, current_bot = self.current_bot)
         elif self.current_bot.diamonds == self.game_object.amount_current_winner:
             self.current_bot.level = 2
         elif self.current_bot.diamonds < (self.game_object.amount_current_winner - 20):
@@ -97,7 +96,7 @@ class Act_On_Card:
 
     # Bot takes action, depending on Level
     def ask_bot(self):
-        console_tell_b_diamonds(game_object = self.game_object, current_bot = self.current_bot)
+        render_tell_b_diamonds(game_object = self.game_object, current_bot = self.current_bot)
         self.last_round_risk()
         if self.current_bot.level == 10:
             level_last_round = Level_Last_Round(self.current_bot, self.game_object)
