@@ -1,5 +1,5 @@
 from Main_Game.m_game import Game
-from Simulation.s_New_Card_Event import s_Draw_Card
+from Main_Game.m_New_Card_Event import Draw_Card
 from Simulation.s_Level_Strategy import s_Act_On_Card
 from Simulation.s_renders import *
 from Main_Game.m_Renderer import SimulationRenderer
@@ -32,7 +32,7 @@ class s_Game(Game):
 
     def still_players_inside(self):
         if not self.no_players_inside():
-            drawcard = s_Draw_Card(self)
+            drawcard = Draw_Card(self)
             drawcard.draw_card()
 
     def identify_round_winner(self):
