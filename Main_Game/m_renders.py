@@ -94,9 +94,10 @@ def render_tell_result(game_object):
 # Ask about playing again
 def render_ask_again(game_object):
     play_again = game_object.renderer.ask_again(self = game_object.renderer)
-    if play_again == "Y" or play_again == "YES":
-        game_object.renderer.render_game(self=game_object.renderer, message=new_line())
-        game_object.reset_game()
-    else:
-        game_object.renderer.render_game(self = game_object.renderer, message=end_of_game())
-        game_object.bool_is_running = False
+    return play_again
+
+def render_new_line(game_object):
+    game_object.renderer.render_game(self=game_object.renderer, message=new_line())
+
+def render_end_of_game(game_object):
+    game_object.renderer.render_game(self=game_object.renderer, message=end_of_game())

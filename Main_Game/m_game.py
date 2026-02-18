@@ -3,6 +3,7 @@ from Main_Game.cards import Cards
 from Main_Game.New_Card_Event import Draw_Card
 from Main_Game.Level_Strategy import Act_On_Card
 from Main_Game.m_renders import *
+from Simulation.s_renders import render_tell_stats, render_ask_for_save
 from Main_Game.probability_and_ev import calc_dying_prob, calc_undiscovered_diamonds
 
 # Main_Game
@@ -13,7 +14,7 @@ class Game:
 
         self.players_amount = 0
         self.bots_amount = 0
-        self.games_amount = 0
+        self.games_amount = 1
 
         # Define explorer lists
         self.list_players = []
@@ -22,6 +23,7 @@ class Game:
         self.list_explorers = []
         self.list_go_home_now = []
         self.list_final_winners = []
+        self.players_inside = []
 
         # Define Main_Game variables
         self.bool_is_running = True
@@ -32,9 +34,6 @@ class Game:
         # Create cards object
         self.cards = Cards(self)
 
-    @property
-    def players_inside(self):
-        return [explorer for explorer in self.list_explorers if explorer.inside]
 
     @property
     def dying_prob(self):
@@ -51,6 +50,7 @@ class Game:
     # Check whether players inside
     @property
     def check_players_inside(self):
+        self.players_inside = [explorer for explorer in self.list_explorers if explorer.inside]
         if len(self.players_inside) == 0:
             return False
         else:
@@ -80,6 +80,7 @@ class Game:
     # Identify diamonds of current winner
     def identify_highest_diamonds(self):
         amount_current_winner = 0
+        self.players_inside = [explorer for explorer in self.list_explorers if explorer.inside]
         for explorer in self.list_explorers:
             e_diamonds = explorer.chest + explorer.pocket + (self.diamonds_on_way // len(self.players_inside))
             if amount_current_winner <= e_diamonds:
@@ -147,15 +148,13 @@ class Game:
                 if diamonds > explorer.max_diamonds:
                     explorer.max_diamonds = diamonds
 
-    # Reset the game
     def reset_game(self):
         self.cards.full_deck = self.cards.traps + self.cards.treasure_cards
-        self.list_bots.clear()
-        self.list_level_bots.clear()
-        self.list_players.clear()
-        self.list_explorers.clear()
-        self.list_final_winners.clear()
-        self.create_explorers()
+        for explorer in self.list_explorers:
+            explorer.inside = True
+            explorer.pocket = 0
+            explorer.chest = 0
+        self.players_inside = [explorer for explorer in self.list_explorers if explorer.inside]
 
     # Play 5 rounds and ask about playing again
     def play_rounds(self):
@@ -169,11 +168,22 @@ class Game:
             self.identify_round_winner()
         self.identify_game_winner()
         render_tell_result(game_object = self)
-        render_ask_again(game_object = self)
 
     # Main method
     def main(self):
         render_welcome_txt(game_object = self)
         self.create_explorers()
         while self.bool_is_running:
-            self.play_rounds()
+            for game_num in range(self.games_amount):
+                self.play_rounds()
+                self.reset_game()
+                play_again = render_ask_again(game_object = self)
+                if play_again == "Y" or play_again == "YES":
+                    render_new_line(game_object = self)
+                else:
+                    render_end_of_game(game_object = self)
+                    self.bool_is_running = False
+        render_tell_stats(game_object=self)
+        if self.bots_amount == 1 and self.players_amount == 0:
+            file_path = "s_stats.txt"
+            render_ask_for_save(game_object=self, file_path=file_path)

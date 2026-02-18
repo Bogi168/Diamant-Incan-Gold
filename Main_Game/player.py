@@ -9,6 +9,7 @@ class Player:
         self.is_bot = is_bot
 
         # Player variables
+        self.level = 0
         self.inside = True
         self.pocket = 0
         self.chest = 0

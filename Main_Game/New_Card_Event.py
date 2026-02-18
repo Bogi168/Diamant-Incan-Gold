@@ -52,6 +52,7 @@ class Draw_Card:
 
     def draw_card(self):
         self.game_object.cards.draw_card()
+        self.game_object.players_inside = [explorer for explorer in self.game_object.list_explorers if explorer.inside]
         if self.check_second_trap():
             drawn_card = Second_Trap(self.game_object)
             drawn_card.act_on_card()
