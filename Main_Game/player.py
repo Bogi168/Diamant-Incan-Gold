@@ -12,7 +12,13 @@ class Player:
         self.inside = True
         self.pocket = 0
         self.chest = 0
+        self.diamond_count = 0
+        self.collected_diamonds = []
+        self.max_diamonds = 0
         self.die_counter = 0
+        self.game_winning_count = 0
+        self.round_winning_count = 0
+        self.prev_round_chest = 0
 
     # Properties
     @property
@@ -51,9 +57,3 @@ class Bot(Player):
         super().__init__(player_name = bot_name, game_object=game_object, is_bot = True)
         self.level = level
         self.bot_name = bot_name
-        self.game_winning_count = 0
-        self.round_winning_count = 0
-        self.prev_round_chest = 0
-        self.diamond_count = 0
-        self.collected_diamonds = []
-        self.max_diamonds = 0

@@ -7,7 +7,7 @@ class Renderer(ABC):
 
     @abstractmethod
     def render_system(self, message):
-        print(message)
+        pass
 
     @abstractmethod
     def ask_players_amount(self):
@@ -66,7 +66,7 @@ class ConsoleRenderer(Renderer):
         print(message)
 
     def render_system(self, message):
-        print(message)
+        pass
 
     def ask_players_amount(self):
         return input("How many players?: ")

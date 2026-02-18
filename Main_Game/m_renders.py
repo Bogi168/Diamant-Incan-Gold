@@ -2,7 +2,7 @@ from Main_Game.player import Player, Bot
 from Main_Game.text import *
 
 def render_welcome_txt(game_object):
-    game_object.renderer.render_system(self = game_object, message = welcome_txt())
+    game_object.renderer.render_game(self = game_object, message = welcome_txt())
 
 # Create players
 def render_create_players(game_object):
@@ -10,6 +10,7 @@ def render_create_players(game_object):
     while not players_amount.isdigit() or int(players_amount) <= 0:
         players_amount = game_object.renderer.re_ask_players_amount(self = game_object.renderer)
     players_amount = int(players_amount)
+    game_object.players_amount = players_amount
     game_object.renderer.render_game(self = game_object.renderer, message = dashes_1())
     for player_num in range(players_amount):
         player_name = game_object.renderer.ask_player_name(self = game_object.renderer, player_num = player_num)
@@ -83,20 +84,19 @@ def render_tell_b_diamonds(game_object, current_bot):
 
 # Present the result
 def render_tell_result(game_object):
-    game_object.renderer.render_system(self = game_object.renderer, message=dashes_5())
-    game_object.identify_game_winner()
+    game_object.renderer.render_game(self = game_object.renderer, message=dashes_5())
     for explorer in game_object.explorers:
-        game_object.renderer.render_system(self = game_object.renderer, message=tell_collected_diamonds(player_name = explorer.player_name, chest = explorer.chest))
-    game_object.renderer.render_system(self = game_object.renderer, message=stars_1())
-    game_object.renderer.render_system(self = game_object.renderer, message=tell_winners(game_object = game_object))
-    game_object.renderer.render_system(self = game_object.renderer, message=stars_2())
+        game_object.renderer.render_game(self = game_object.renderer, message=tell_collected_diamonds(player_name = explorer.player_name, chest = explorer.chest))
+    game_object.renderer.render_game(self = game_object.renderer, message=stars_1())
+    game_object.renderer.render_game(self = game_object.renderer, message=tell_winners(game_object = game_object))
+    game_object.renderer.render_game(self = game_object.renderer, message=stars_2())
 
 # Ask about playing again
 def render_ask_again(game_object):
     play_again = game_object.renderer.ask_again(self = game_object.renderer)
     if play_again == "Y" or play_again == "YES":
-        game_object.renderer.render_system(self=game_object.renderer, message=new_line())
+        game_object.renderer.render_game(self=game_object.renderer, message=new_line())
         game_object.reset_game()
     else:
-        game_object.renderer.render_system(self = game_object.renderer, message=end_of_game())
+        game_object.renderer.render_game(self = game_object.renderer, message=end_of_game())
         game_object.is_running = False

@@ -12,6 +12,10 @@ class Game:
         self.renderer = renderer
         self.bool_adjust_risk_last_round = bool_adjust_risk_last_round
 
+        self.players_amount = 0
+        self.bots_amount = 0
+        self.games_amount = 0
+
         # Define explorer lists
         self.players = []
         self.level_bots = []
@@ -43,6 +47,14 @@ class Game:
     def amount_current_winner(self):
         return self.identify_highest_diamonds()
 
+    # Check whether players inside
+    @property
+    def check_players_inside(self):
+        if len(self.players_inside) == 0:
+            return False
+        else:
+            return True
+
 
     # Create explorers
     def create_explorers(self):
@@ -57,27 +69,15 @@ class Game:
     # Reset previous round and add relics
     def reset_round(self):
         self.players_inside.clear()
-        for p in self.explorers:
-            p.inside = True
+        for explorer in self.explorers:
+            explorer.inside = True
+            explorer.prev_round_chest = explorer.chest
         self.players_inside = [p for p in self.explorers]
         self.diamonds_on_way = 0
         self.relics_on_way = 0
         self.cards.reset_played_cards()
         self.cards.add_relics()
 
-    # Start Round
-    def start_round(self):
-        self.reset_round()
-        render_tell_round(game_object = self)
-        self.p_inside = True
-
-    # Check whether players inside
-    def no_players_inside(self):
-        if len(self.players_inside) == 0:
-            self.p_inside = False
-            return True
-        else:
-            return False
 
     # Identify diamonds of current winner
     def identify_highest_diamonds(self):
@@ -96,7 +96,7 @@ class Game:
             if decision == "leave":
                 current_player.go_home()
         elif len(self.bots) != 0 and current_player.is_bot:
-            act_on_card = Act_On_Card(self, current_player)
+            act_on_card = Act_On_Card(game_object = self, current_bot = current_player)
             act_on_card.ask_bot()
 
 
@@ -113,21 +113,41 @@ class Game:
             self.go_home_now[0].chest += self.relics_on_way
             self.relics_on_way = 0
 
-    # Still players inside
-    def still_players_inside(self):
-        if not self.no_players_inside():
-            drawcard = Draw_Card(self)
-            drawcard.draw_card()
+    def identify_round_winner(self):
+        round_winners = []
+        amount_round_winner = 0
+        for explorer in self.explorers:
+            booty = explorer.chest - explorer.prev_round_chest
+            if amount_round_winner < booty:
+                amount_round_winner = booty
+                round_winners.clear()
+                round_winners.append(explorer)
+            elif amount_round_winner == booty:
+                round_winners.append(explorer)
+            explorer.diamond_count += explorer.chest
+            explorer.collected_diamonds.append(booty)
+        for winner in round_winners:
+            winner.round_winning_count += 1
 
     def identify_game_winner(self):
+        final_winners = []
         amount_final_winner = 0
+        for s in self.explorers:
+            if amount_final_winner < s.chest:
+                amount_final_winner = s.chest
+                final_winners.clear()
+                final_winners.append(s)
+            elif amount_final_winner == s.chest:
+                final_winners.append(s)
+        self.final_winners = final_winners
+        for winner in final_winners:
+            winner.game_winning_count += 1
+
+    def get_max_diamonds(self):
         for explorer in self.explorers:
-            if amount_final_winner < explorer.chest:
-                amount_final_winner = explorer.chest
-                self.final_winners.clear()
-                self.final_winners.append(explorer)
-            elif amount_final_winner == explorer.chest:
-                self.final_winners.append(explorer)
+            for diamonds in explorer.collected_diamonds:
+                if diamonds > explorer.max_diamonds:
+                    explorer.max_diamonds = diamonds
 
     # Reset the game
     def reset_game(self):
@@ -142,10 +162,18 @@ class Game:
     # Play 5 rounds and ask about playing again
     def play_rounds(self):
         for self.rounds in range(5):
-            self.start_round()
+            # Start Round
+            self.reset_round()
+            render_tell_round(game_object=self)
+            self.p_inside = True
             while self.p_inside:
-                self.no_players_inside()
-                self.still_players_inside()
+                if self.check_players_inside:
+                    drawcard = Draw_Card(self)
+                    drawcard.draw_card()
+                else:
+                    self.p_inside = False
+            self.identify_round_winner()
+        self.identify_game_winner()
         render_tell_result(game_object = self)
         render_ask_again(game_object = self)
 
