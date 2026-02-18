@@ -11,13 +11,13 @@ class s_Auto_Game(s_Game):
         self.level_bot = 0
 
     def create_bot(self):
-        self.explorers.append(
-            Bot(bot_name=f"Bot {self.level_bot}", level = self.level_bot, game_object = self))
+        self.bots.clear()
+        self.bots.append(Bot(bot_name=f"Bot {self.level_bot}", level = self.level_bot, game_object = self))
+        self.explorers = self.bots.copy()
 
     def main(self):
         render_select_games_amount(game_object = self)
         for self.level_bot in range(1, 14):
-            self.explorers.clear()
             self.create_bot()
             self.players_inside = [p for p in self.explorers if p.inside]
             for game_num in range(self.games_amount):

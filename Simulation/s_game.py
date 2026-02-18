@@ -13,10 +13,10 @@ class s_Game(Game):
 
     def reset_game(self):
         self.cards.full_deck = self.cards.traps + self.cards.treasure_cards
-        for b in self.explorers:
-            b.inside = True
-            b.pocket = 0
-            b.chest = 0
+        for explorer in self.explorers:
+            explorer.inside = True
+            explorer.pocket = 0
+            explorer.chest = 0
 
     def main(self):
         self.create_explorers()

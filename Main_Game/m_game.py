@@ -124,7 +124,7 @@ class Game:
                 round_winners.append(explorer)
             elif amount_round_winner == booty:
                 round_winners.append(explorer)
-            explorer.diamond_count += explorer.chest
+            explorer.diamond_count += booty
             explorer.collected_diamonds.append(booty)
         for winner in round_winners:
             winner.round_winning_count += 1
@@ -139,7 +139,7 @@ class Game:
                 final_winners.append(s)
             elif amount_final_winner == s.chest:
                 final_winners.append(s)
-        self.final_winners = final_winners
+        self.final_winners = final_winners.copy()
         for winner in final_winners:
             winner.game_winning_count += 1
 
