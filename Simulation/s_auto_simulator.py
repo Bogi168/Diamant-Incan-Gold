@@ -1,4 +1,5 @@
-from Simulation.s_renders import render_select_games_amount, render_ask_for_save
+from Simulation.s_stat_saver import save_statistics
+from Simulation.s_renders import render_select_games_amount
 from Main_Game.player import Bot
 from Simulation.s_game import s_Game
 
@@ -20,7 +21,7 @@ class s_Auto_Game(s_Game):
                 self.play_rounds()
                 self.reset_game()
             file_path = "s_auto_simulation"
-            render_ask_for_save(game_object = self, file_path = file_path)
+            save_statistics(game_object = self, file_path = file_path)
 
 if __name__ == "__main__":
     game = s_Auto_Game()
