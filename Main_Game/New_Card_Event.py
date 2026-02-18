@@ -15,7 +15,6 @@ class Second_Trap(New_Card):
         self.game_object.cards.full_deck.remove(self.game_object.cards.new_card)
         for player in self.game_object.players_inside:
             player.die()
-        self.game_object.p_inside = False
 
 class First_Trap(New_Card):
     def act_on_card(self):
@@ -72,7 +71,6 @@ class Draw_Card:
 
             self.game_object.split_diamonds_on_way()
             self.game_object.earn_relics()
-            self.game_object.go_home_now.clear()
-            self.game_object.players_inside = [p for p in self.game_object.explorers if p.inside]
+            self.game_object.list_go_home_now.clear()
             self.game_object.cards.played_cards.append(self.game_object.cards.new_card)
             render_tell_played_cards(game_object = self.game_object, cards_object = self.game_object.cards)

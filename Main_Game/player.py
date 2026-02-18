@@ -41,7 +41,7 @@ class Player:
     def go_home(self):
         self.chest += self.pocket
         self.pocket = 0
-        self.game_object.go_home_now.append(self)
+        self.game_object.list_go_home_now.append(self)
         self.inside = False
 
     # Player dies

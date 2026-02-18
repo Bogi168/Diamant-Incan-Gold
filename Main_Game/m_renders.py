@@ -14,7 +14,7 @@ def render_create_players(game_object):
     game_object.renderer.render_game(self = game_object.renderer, message = dashes_1())
     for player_num in range(players_amount):
         player_name = game_object.renderer.ask_player_name(self = game_object.renderer, player_num = player_num)
-        game_object.players.append(Player(player_name = player_name, game_object = game_object))
+        game_object.list_players.append(Player(player_name = player_name, game_object = game_object))
         game_object.renderer.render_game(self = game_object.renderer, message=dashes_2())
 
 # Create bots
@@ -30,7 +30,7 @@ def render_create_bots(game_object):
             while not level_bot in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"):
                 level_bot = game_object.renderer.re_ask_bot_level(self = game_object.renderer, bot_num = bot_num)
             level_bot = int(level_bot)
-            game_object.bots.append(Bot(bot_name = f"Bot {bot_num + 1}", level = level_bot, game_object = game_object))
+            game_object.list_bots.append(Bot(bot_name =f"Bot {bot_num + 1}", level = level_bot, game_object = game_object))
             game_object.renderer.render_game(self = game_object.renderer, message=dashes_4())
 
 # Current round
@@ -85,7 +85,7 @@ def render_tell_b_diamonds(game_object, current_bot):
 # Present the result
 def render_tell_result(game_object):
     game_object.renderer.render_game(self = game_object.renderer, message=dashes_5())
-    for explorer in game_object.explorers:
+    for explorer in game_object.list_explorers:
         game_object.renderer.render_game(self = game_object.renderer, message=tell_collected_diamonds(player_name = explorer.player_name, chest = explorer.chest))
     game_object.renderer.render_game(self = game_object.renderer, message=stars_1())
     game_object.renderer.render_game(self = game_object.renderer, message=tell_winners(game_object = game_object))
@@ -99,4 +99,4 @@ def render_ask_again(game_object):
         game_object.reset_game()
     else:
         game_object.renderer.render_game(self = game_object.renderer, message=end_of_game())
-        game_object.is_running = False
+        game_object.bool_is_running = False

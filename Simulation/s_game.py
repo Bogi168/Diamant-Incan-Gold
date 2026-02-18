@@ -8,12 +8,11 @@ class s_Game(Game):
 
     def create_explorers(self):
         render_create_bots(game_object = self)
-        self.players_inside = [p for p in self.explorers if p.inside]
         render_select_games_amount(game_object = self)
 
     def reset_game(self):
         self.cards.full_deck = self.cards.traps + self.cards.treasure_cards
-        for explorer in self.explorers:
+        for explorer in self.list_explorers:
             explorer.inside = True
             explorer.pocket = 0
             explorer.chest = 0
@@ -25,4 +24,5 @@ class s_Game(Game):
             self.reset_game()
         render_tell_stats(game_object = self)
         if self.bots_amount == 1:
-            render_ask_for_save(game_object = self)
+            file_path = "s_stats.txt"
+            render_ask_for_save(game_object = self, file_path = file_path)

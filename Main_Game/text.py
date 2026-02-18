@@ -84,7 +84,7 @@ def tell_collected_diamonds(player_name, chest):
     return f"{player_name} collected {chest} Diamonds"
 
 def tell_winners(game_object):
-    names = [winner.player_name for winner in game_object.final_winners]
+    names = [winner.player_name for winner in game_object.list_final_winners]
     if len(names) == 1:
         return f"The winner is: {names[0]}"
     elif len(names) == 2:

@@ -14,8 +14,8 @@ def render_select_bots_level(game_object):
         while not level_bot in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"):
             level_bot = game_object.renderer.ask_bot_level(self = game_object.renderer, bot_num = bot_num)
         level_bot = int(level_bot)
-        game_object.bots.append(Bot(bot_name=f"Bot {bot_num + 1}", level=level_bot, game_object = game_object))
-        game_object.explorers = game_object.bots.copy()
+        game_object.list_bots.append(Bot(bot_name=f"Bot {bot_num + 1}", level=level_bot, game_object = game_object))
+        game_object.list_explorers = game_object.list_bots.copy()
 
 def render_create_bots(game_object):
     render_select_bots_amount(game_object = game_object)
@@ -29,11 +29,10 @@ def render_select_games_amount(game_object):
 
 def render_tell_stats(game_object):
     game_object.get_max_diamonds()
-    for explorer in game_object.explorers:
+    for explorer in game_object.list_explorers:
         game_object.renderer.render_system(self = game_object.renderer, message = tell_stats(game_object = game_object, explorer = explorer))
 
-def render_ask_for_save(game_object):
-    file_path = "s_stats.txt"
+def render_ask_for_save(game_object, file_path):
     save_answer = game_object.renderer.ask_for_save(self= game_object.renderer)
     if save_answer in ("Y", "YES"):
         save_statistics(game_object = game_object, file_path = file_path)
