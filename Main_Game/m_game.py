@@ -5,7 +5,6 @@ from Main_Game.Level_Strategy import Act_On_Card
 from Main_Game.m_renders import *
 from Main_Game.probability_and_ev import calc_dying_prob, calc_undiscovered_diamonds
 
-
 # Main_Game
 class Game:
     def __init__(self, renderer, bool_adjust_risk_last_round = True):
