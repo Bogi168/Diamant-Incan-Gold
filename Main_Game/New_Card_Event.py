@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from Main_Game.m_renders import render_tell_played_cards, render_tell_new_card, render_second_trap, render_tell_probability
+from Main_Game.renders import render_tell_played_cards, render_tell_new_card, render_second_trap, render_tell_probability
 
 class New_Card(ABC):
     def __init__(self, game_object):
@@ -26,8 +26,9 @@ class Treasure_Card(New_Card):
     def act_on_card(self):
         self.game_object.diamonds_on_way += self.game_object.cards.new_card.value % len(self.game_object.players_inside)
         for player in self.game_object.players_inside:
-            render_tell_probability(game_object = self.game_object)
             player.pocket += self.game_object.cards.new_card.value // len(self.game_object.players_inside)
+        for player in self.game_object.players_inside:
+            render_tell_probability(game_object=self.game_object)
             self.game_object.ask_explorer(player)
 
 

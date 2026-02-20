@@ -1,10 +1,9 @@
-# Classes Player and Bot
-from Main_Game.cards import Cards
+from Main_Game.Cards import Cards
 from Main_Game.New_Card_Event import Draw_Card
 from Main_Game.Level_Strategy import Act_On_Card
-from Main_Game.m_renders import *
-from Simulation.s_renders import render_tell_stats, render_ask_for_save
+from Main_Game.renders import *
 from Main_Game.probability_and_ev import calc_dying_prob, calc_undiscovered_diamonds
+from Main_Game.Renderer import SimulationRenderer
 
 # Main_Game
 class Game:
@@ -61,10 +60,13 @@ class Game:
     def create_explorers(self):
         render_create_players(game_object = self)
         render_create_bots(game_object = self)
-        if len(self.list_bots) == 0:
-            self.list_explorers = self.list_players
+        if self.bots_amount == 0:
+            self.list_explorers = self.list_players.copy()
+        elif self.players_amount == 0:
+            self.list_explorers = self.list_bots.copy()
+            render_select_games_amount(game_object=self)
         else:
-            self.list_explorers = self.list_players + self.list_bots
+            self.list_explorers = self.list_players.copy() + self.list_bots.copy()
 
     # Reset previous round and add relics
     def reset_round(self):
@@ -80,7 +82,6 @@ class Game:
     # Identify diamonds of current winner
     def identify_highest_diamonds(self):
         amount_current_winner = 0
-        self.players_inside = [explorer for explorer in self.list_explorers if explorer.inside]
         for explorer in self.list_explorers:
             e_diamonds = explorer.chest + explorer.pocket + (self.diamonds_on_way // len(self.players_inside))
             if amount_current_winner <= e_diamonds:
@@ -185,5 +186,9 @@ class Game:
                     self.bool_is_running = False
         render_tell_stats(game_object=self)
         if self.bots_amount == 1 and self.players_amount == 0:
-            file_path = "s_stats.txt"
+            file_path = "stats.txt"
             render_ask_for_save(game_object=self, file_path=file_path)
+
+class s_Game(Game):
+    def __init__(self):
+        super().__init__(renderer = SimulationRenderer, bool_adjust_risk_last_round = False)

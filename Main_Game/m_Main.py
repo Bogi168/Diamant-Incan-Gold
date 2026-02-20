@@ -1,4 +1,4 @@
-from Main_Game.m_game import Game
+from Main_Game.Game import Game
 from Main_Game.Renderer import ConsoleRenderer
 
 if __name__ == "__main__":

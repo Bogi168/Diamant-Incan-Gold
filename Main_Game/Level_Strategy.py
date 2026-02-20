@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from Main_Game.m_renders import render_bot_goes_home, render_bot_stays_inside, render_tell_b_diamonds
+from Main_Game.renders import render_bot_goes_home, render_bot_stays_inside, render_tell_b_diamonds
 from Main_Game.probability_and_ev import calc_ev_next_without_dia_on_way
 
 
@@ -157,6 +157,14 @@ class Act_On_Card:
         self.game_object = game_object
         self.current_bot = current_bot
 
+    def reset_bot_level(self):
+        for i in range(self.game_object.bots_amount):
+            self.game_object.list_bots[i].level = self.game_object.list_level_bots[i]
+        if self.game_object.players_amount == 0:
+            self.game_object.list_explorers = self.game_object.list_bots.copy()
+        else:
+            self.game_object.list_explorers = self.game_object.list_players.copy() + self.game_object.list_bots.copy()
+
     def adjust_risk_last_round(self):
         amount_current_winner = self.game_object.amount_current_winner
         current_diamonds = self.current_bot.current_diamonds
@@ -168,6 +176,8 @@ class Act_On_Card:
             self.current_bot.level = 2
         elif self.game_object.rounds == 4 and current_diamonds < (amount_current_winner - 20):
             self.current_bot.level = 3
+        elif self.game_object.rounds != 4 and self.current_bot.level in (2, 3, 999):
+            self.reset_bot_level()
 
     # Bot takes action, depending on Level
     def ask_bot(self):

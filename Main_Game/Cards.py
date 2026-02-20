@@ -28,7 +28,6 @@ class Cards:
         self.deck = []
         self.new_card = None
         self.played_cards = []
-        self.p_relics = self.relics.copy()
 
     # Reset played cards
     def reset_played_cards(self):
@@ -42,6 +41,6 @@ class Cards:
 
     # Add relics
     def add_relics(self):
-        relic = self.p_relics[self.game_object.rounds]
+        relic = self.relics[self.game_object.rounds]
         self.full_deck.append(relic)
         self.deck = self.full_deck.copy()

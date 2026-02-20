@@ -1,7 +1,7 @@
-from Simulation.s_stat_saver import save_statistics
-from Simulation.s_renders import render_select_games_amount
-from Main_Game.player import Bot
-from Simulation.s_game import s_Game
+from Simulation.stat_saver import save_statistics
+from Main_Game.renders import render_select_games_amount
+from Main_Game.Player import Bot
+from Main_Game.Game import s_Game
 
 class s_Auto_Game(s_Game):
     def __init__(self):
@@ -20,7 +20,7 @@ class s_Auto_Game(s_Game):
             for game_num in range(self.games_amount):
                 self.play_rounds()
                 self.reset_game()
-            file_path = "s_auto_simulation"
+            file_path = "auto_simulation"
             save_statistics(game_object = self, file_path = file_path)
 
 if __name__ == "__main__":

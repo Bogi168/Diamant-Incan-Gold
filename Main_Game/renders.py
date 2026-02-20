@@ -1,5 +1,6 @@
-from Main_Game.player import Player, Bot
+from Main_Game.Player import Player, Bot
 from Main_Game.text import *
+from Simulation.stat_saver import *
 
 def render_welcome_txt(game_object):
     game_object.renderer.render_game(self = game_object, message = welcome_txt())
@@ -7,8 +8,10 @@ def render_welcome_txt(game_object):
 # Create players
 def render_create_players(game_object):
     players_amount = game_object.renderer.ask_players_amount(self = game_object.renderer)
-    while not players_amount.isdigit() or int(players_amount) <= 0:
+    while players_amount != None and not (players_amount.isdigit() or int(players_amount) <= 0):
         players_amount = game_object.renderer.re_ask_players_amount(self = game_object.renderer)
+    if players_amount == None:
+        players_amount = 0
     players_amount = int(players_amount)
     game_object.players_amount = players_amount
     game_object.renderer.render_game(self = game_object.renderer, message = dashes_1())
@@ -18,20 +21,33 @@ def render_create_players(game_object):
         game_object.renderer.render_game(self = game_object.renderer, message=dashes_2())
 
 # Create bots
-def render_create_bots(game_object):
+def render_select_bots_amount(game_object):
     bots_amount = game_object.renderer.ask_bots_amount(self = game_object.renderer)
-    while not bots_amount.isdigit() or int(bots_amount) < 0:
-        bots_amount = game_object.renderer.re_ask_bots_amount(self = game_object.renderer)
+    if game_object.players_amount == 0:
+        while not bots_amount.isdigit() or int(bots_amount) <= 0:
+            bots_amount = game_object.renderer.re_ask_bots_amount(self=game_object.renderer)
+    else:
+        while not bots_amount.isdigit() or int(bots_amount) < 0:
+            bots_amount = game_object.renderer.re_ask_bots_amount(self = game_object.renderer)
     bots_amount = int(bots_amount)
-    if bots_amount != 0:
-        for bot_num in range(bots_amount):
+    game_object.bots_amount = bots_amount
+
+def render_select_bot_level(game_object):
+    if game_object.bots_amount != 0:
+        for bot_num in range(game_object.bots_amount):
             game_object.renderer.render_game(self = game_object.renderer, message=dashes_3())
             level_bot = game_object.renderer.ask_bot_level(self = game_object.renderer, bot_num = bot_num)
             while not level_bot in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"):
                 level_bot = game_object.renderer.re_ask_bot_level(self = game_object.renderer, bot_num = bot_num)
             level_bot = int(level_bot)
+            game_object.list_level_bots.append(level_bot)
             game_object.list_bots.append(Bot(bot_name =f"Bot {bot_num + 1}", level = level_bot, game_object = game_object))
             game_object.renderer.render_game(self = game_object.renderer, message=dashes_4())
+
+def render_create_bots(game_object):
+    render_select_bots_amount(game_object = game_object)
+    render_select_bot_level(game_object = game_object)
+
 
 # Current round
 def render_tell_round(game_object):
@@ -101,3 +117,23 @@ def render_new_line(game_object):
 
 def render_end_of_game(game_object):
     game_object.renderer.render_game(self=game_object.renderer, message=end_of_game())
+
+# Simulation
+def render_select_games_amount(game_object):
+    games_amount = game_object.renderer.ask_games_amount(self = game_object.renderer)
+    while not games_amount.isdigit() or int(games_amount) <= 0:
+        games_amount = game_object.renderer.re_ask_games_amount(self = game_object.renderer)
+    game_object.games_amount = int(games_amount)
+
+def render_tell_stats(game_object):
+    game_object.get_max_diamonds()
+    for explorer in game_object.list_explorers:
+        game_object.renderer.render_system(self = game_object.renderer, message = tell_stats(game_object = game_object, explorer = explorer))
+
+def render_ask_for_save(game_object, file_path):
+    save_answer = game_object.renderer.ask_for_save(self= game_object.renderer)
+    if save_answer in ("Y", "YES"):
+        save_statistics(game_object = game_object, file_path = file_path)
+        game_object.renderer.render_system(self = game_object.renderer, message = save_stats(file_path = file_path))
+    else:
+        game_object.renderer.render_system(self = game_object.renderer, message = delete_stats())
