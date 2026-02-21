@@ -191,4 +191,5 @@ class Game:
 
 class s_Game(Game):
     def __init__(self):
-        super().__init__(renderer = SimulationRenderer, bool_adjust_risk_last_round = False)
+        simulation_renderer = SimulationRenderer()
+        super().__init__(renderer = simulation_renderer, bool_adjust_risk_last_round = False)
